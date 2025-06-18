@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { MdAdd, MdVisibility, MdEdit, MdDelete, MdErrorOutline, MdPushPin, MdRemoveRedEye } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faPlus,
+  faEye,
+  faPenToSquare,
+  faTrash,
+  faCircleExclamation,
+  faThumbtack,
+  faEyeSlash
+} from '@fortawesome/free-solid-svg-icons';
 
 const noticeStats = [
   { label: '전체 공지', value: 2 },
-  { label: '긴급 공지', value: 1, icon: <MdErrorOutline className="text-[var(--red500)]" /> },
-  { label: '고정 공지', value: 1, icon: <MdPushPin className="text-[var(--primaryBlue)]" /> },
-  { label: '총 조회수', value: 390, icon: <MdRemoveRedEye className="text-[var(--contentCaption)]" /> },
+  { label: '긴급 공지', value: 1, icon: <FontAwesomeIcon icon={faCircleExclamation} className="text-[var(--red500)]" /> },
+  { label: '고정 공지', value: 1, icon: <FontAwesomeIcon icon={faThumbtack} className="text-[var(--primaryBlue)]" /> },
+  { label: '총 조회수', value: 390, icon: <FontAwesomeIcon icon={faEye} className="text-[var(--contentCaption)]" /> },
 ];
 
 const notices = [
@@ -45,7 +54,7 @@ export default function Notice() {
       {/* 상단 타이틀 + 추가 버튼 (버튼 오른쪽 끝 고정) */}
       <div className="flex items-center justify-between px-10 pt-10 pb-2 mb-6">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">공지사항 관리</h1>
-        <button className="button-primary-m flex items-center gap-1 px-5 py-3 whitespace-nowrap"><MdAdd size={20}/> 공지사항 추가</button>
+        <button className="button-primary-m flex items-center gap-1 px-5 py-3 whitespace-nowrap"><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 공지사항 추가</button>
       </div>
       {/* 통계 카드 전체 너비, 한 줄 4개 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-10 mb-8 w-full">
@@ -102,9 +111,9 @@ export default function Notice() {
                 <td className="py-3 px-2 text-center">{n.views}회</td>
                 <td className="py-3 px-2 text-center">{n.date}</td>
                 <td className="py-3 px-2 text-center">
-                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><MdVisibility size={18}/></button>
-                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><MdEdit size={18}/></button>
-                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><MdDelete size={18}/></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
                 </td>
               </tr>
             ))}

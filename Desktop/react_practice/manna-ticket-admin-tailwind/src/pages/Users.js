@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { MdDownload, MdAdd, MdEdit, MdVisibility, MdDelete, MdSearch } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faDownload, 
+  faPlus, 
+  faPenToSquare, 
+  faEye, 
+  faTrash, 
+  faMagnifyingGlass 
+} from '@fortawesome/free-solid-svg-icons';
 
 const statCards = [
   { label: '전체 사용자', value: 156 },
@@ -9,9 +17,9 @@ const statCards = [
 ];
 
 const initialUsers = [
-  { id: 1, name: '김철수', email: 'kim@example.com', status: '활성', count: 23, qr: 95, lastLogin: '2024-01-15' },
-  { id: 2, name: '이영희', email: 'lee@example.com', status: '비활성', count: 15, qr: 87, lastLogin: '2024-01-10' },
-  { id: 3, name: '박민수', email: 'park@example.com', status: '활성', count: 31, qr: 100, lastLogin: '2024-01-14' },
+  { id: 1, name: '김철수', personalNumber: '00371210-00149', status: '활성', count: 23, qr: 95, lastLogin: '2024-01-15' },
+  { id: 2, name: '이영희', personalNumber: '00371210-00150', status: '비활성', count: 15, qr: 87, lastLogin: '2024-01-10' },
+  { id: 3, name: '박민수', personalNumber: '00371210-00151', status: '활성', count: 31, qr: 100, lastLogin: '2024-01-14' },
 ];
 
 export default function Users() {
@@ -19,30 +27,30 @@ export default function Users() {
   const [filter, setFilter] = useState('전체');
   const [users, setUsers] = useState(initialUsers);
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', status: '활성' });
+  const [form, setForm] = useState({ name: '', personalNumber: '', status: '활성' });
 
   const filteredUsers = users.filter(
     (u) =>
       (filter === '전체' || u.status === filter) &&
-      (!search || u.name.includes(search) || u.email.includes(search))
+      (!search || u.name.includes(search) || u.personalNumber.includes(search))
   );
 
   const handleAddUser = (e) => {
     e.preventDefault();
-    if (!form.name || !form.email) return;
+    if (!form.name || !form.personalNumber) return;
     setUsers([
       ...users,
       {
         id: users.length + 1,
         name: form.name,
-        email: form.email,
+        personalNumber: form.personalNumber,
         status: form.status,
         count: 0,
         qr: 0,
         lastLogin: '-',
       },
     ]);
-    setForm({ name: '', email: '', status: '활성' });
+    setForm({ name: '', personalNumber: '', status: '활성' });
     setModalOpen(false);
   };
 
@@ -52,8 +60,8 @@ export default function Users() {
       <div className="flex items-center justify-between px-10 pt-10 pb-4">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">사용자 관리</h1>
         <div className="flex gap-2">
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><MdDownload size={18}/> 사용자 목록 내보내기</button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => setModalOpen(true)}><MdAdd size={18}/> 사용자 추가</button>
+          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 사용자 목록 내보내기</button>
+          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => setModalOpen(true)}><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 사용자 추가</button>
         </div>
       </div>
       {/* 사용자 추가 모달 */}
@@ -71,9 +79,9 @@ export default function Users() {
             <input
               className="border border-[var(--borderInput)] rounded px-3 py-2 text-sm"
               placeholder="이메일"
-              type="email"
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
+              type="number"
+              value={form.personalNumber}
+              onChange={e => setForm({ ...form, personalNumber: e.target.value })}
               required
             />
             <select
@@ -107,7 +115,7 @@ export default function Users() {
         <div className="flex gap-2 items-center mb-4">
           <div className="relative">
             <input type="text" className="w-full pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" style={{width:220}} placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
-            <MdSearch size={18} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
           </div>
           <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--white)] text-sm" value={filter} onChange={e => setFilter(e.target.value)} style={{width:100}}>
             <option value="전체">전체</option>
@@ -132,7 +140,7 @@ export default function Users() {
               {filteredUsers.map(row => (
                 <tr key={row.id} className="border-b last:border-b-0">
                   <td className="py-2 text-center">{row.name}</td>
-                  <td className="py-2 text-center">{row.email}</td>
+                  <td className="py-2 text-center">{row.personalNumber}</td>
                   <td className="py-2 text-center">
                     <span className={`px-2 py-1 rounded text-xs font-bold ${row.status === '활성' ? 'bg-[var(--green100)] text-[var(--green500)]' : 'bg-[var(--bgTertiary)] text-[var(--contentCaption)]'}`}>{row.status}</span>
                   </td>
@@ -147,9 +155,9 @@ export default function Users() {
                   </td>
                   <td className="py-2 text-center">{row.lastLogin}</td>
                   <td className="py-2 text-center">
-                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><MdEdit size={18}/></button>
-                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><MdVisibility size={18}/></button>
-                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><MdDelete size={18}/></button>
+                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
+                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}

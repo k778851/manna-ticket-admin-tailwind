@@ -1,5 +1,10 @@
 import React from 'react';
-import { MdDownload, MdNotificationsNone, MdBlock } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faDownload,
+  faBell,
+  faBan
+} from '@fortawesome/free-solid-svg-icons';
 
 const qrStats = {
   todaySubmit: 67,
@@ -19,7 +24,9 @@ export default function QR() {
       <div className="flex items-center justify-between px-10 pt-10 pb-4">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">QR 코드 관리</h1>
         <div className="flex gap-2">
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><MdDownload size={18}/> QR 통계 내보내기</button>
+          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]">
+            <FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> QR 통계 내보내기
+          </button>
         </div>
       </div>
       {/* 통계 카드 */}
@@ -69,9 +76,11 @@ export default function QR() {
                   </td>
                   <td className="py-2 text-left">
                     <div className="flex flex-row gap-2 items-center">
-                      <button className="px-3 py-1 rounded border border-[var(--primaryBlue)] text-[var(--primaryBlue)] text-xs font-semibold inline-flex items-center gap-1 hover:bg-[var(--blue50)] transition min-w-[80px] justify-center"><MdNotificationsNone size={16}/> 알림 발송</button>
+                      <button className="px-3 py-1 rounded border border-[var(--primaryBlue)] text-[var(--primaryBlue)] text-xs font-semibold inline-flex items-center gap-1 hover:bg-[var(--blue50)] transition min-w-[80px] justify-center">
+                        <FontAwesomeIcon icon={faBell} className="w-4 h-4" /> 알림 발송</button>
                       {row.status === '경고' && (
-                        <button className="px-3 py-1 rounded border border-[var(--red500)] text-[var(--red500)] text-xs font-semibold inline-flex items-center gap-1 hover:bg-[var(--red50)] transition min-w-[60px] justify-center"><MdBlock size={16}/> 재제</button>
+                        <button className="px-3 py-1 rounded border border-[var(--red500)] text-[var(--red500)] text-xs font-semibold inline-flex items-center gap-1 hover:bg-[var(--red50)] transition min-w-[60px] justify-center">
+                          <FontAwesomeIcon icon={faBan} className="w-4 h-4" /> 재제</button>
                       )}
                     </div>
                   </td>

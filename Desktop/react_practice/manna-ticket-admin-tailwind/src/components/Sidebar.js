@@ -1,39 +1,93 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MdDashboard, MdPeople, MdEvent, MdQrCode, MdRestaurantMenu, MdAnnouncement, MdFavorite, MdSettings, MdHelp } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faGaugeHigh, 
+  faUsers, 
+  faCalendarDays, 
+  faQrcode, 
+  faUtensils, 
+  faBullhorn, 
+  faHeart, 
+  faGear, 
+  faCircleQuestion, 
+  faUser, 
+  faRightFromBracket,
+  faBars
+} from '@fortawesome/free-solid-svg-icons';
 
 const menus = [
-  { key: 'dashboard', label: '대시보드', icon: <MdDashboard size={20}/>, path: '/dashboard' },
-  { key: 'users', label: '사용자', icon: <MdPeople size={20}/>, path: '/users' },
-  { key: 'reservations', label: '예약 현황', icon: <MdEvent size={20}/>, path: '/reservations' },
-  { key: 'qr', label: 'QR 코드', icon: <MdQrCode size={20}/>, path: '/qr' },
-  { key: 'menu', label: '식단 메뉴', icon: <MdRestaurantMenu size={20}/>, path: '/menu' },
-  { key: 'notice', label: '공지사항', icon: <MdAnnouncement size={20}/>, path: '/notice' },
-  { key: 'sponser', label: '후원 현황', icon: <MdFavorite size={20}/>, path: '/sponser' },
-  { key: 'settings', label: '시스템 설정', icon: <MdSettings size={20}/>, path: '/settings' },
-  { key: 'help', label: '도움말', icon: <MdHelp size={20}/>, path: '/help' },
+  { path: '/', icon: faGaugeHigh, label: '대시보드' },
+  { path: '/users', icon: faUsers, label: '회원 관리' },
+  { path: '/reservations', icon: faCalendarDays, label: '예약 관리' },
+  { path: '/qr', icon: faQrcode, label: 'QR 관리' },
+  { path: '/menu', icon: faUtensils, label: '메뉴 관리' },
+  { path: '/notice', icon: faBullhorn, label: '공지사항' },
+  { path: '/sponser', icon: faHeart, label: '후원 관리' },
+  { path: '/settings', icon: faGear, label: '설정' },
+  { path: '/help', icon: faCircleQuestion, label: '도움말' },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isCollapsed, onToggle }) {
   const location = useLocation();
   const navigate = useNavigate();
+
   return (
-    <aside className="w-60 bg-white border-r border-[var(--borderOutline)] flex flex-col py-8 px-4 min-h-screen shadow-sm">
-      <nav className="flex-1 mt-2">
-        <ul className="space-y-1 text-[15px]">
-          {menus.map(menu => (
-            <li key={menu.key}>
+    <aside className={`fixed top-0 left-0 h-screen bg-white border-r border-[var(--borderOutline)] flex flex-col transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-60'}`}>
+      <div className="p-4 border-b border-[var(--borderOutline)]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {!isCollapsed && <span className="text-lg font-semibold text-[var(--contentMain)]">만나식권 관리자</span>}
+          </div>
+          <button
+            onClick={onToggle}
+            className={`p-1 rounded-lg hover:bg-[var(--bgTertiary)] transition-colors ${isCollapsed ? 'flex justify-center items-center w-full' : ''}`}
+            aria-label={isCollapsed ? "사이드바 펼치기" : "사이드바 접기"}
+          >
+            <FontAwesomeIcon icon={faBars} className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto py-4">
+        <ul className="space-y-1 px-2">
+          {menus.map((menu) => (
+            <li key={menu.path}>
               <button
-                className={`flex items-center gap-2 py-2 px-3 rounded-md w-full text-left transition font-semibold ${((menu.key === 'dashboard' && (location.pathname === '/' || location.pathname === '/dashboard')) || (menu.path !== '/dashboard' && location.pathname === menu.path)) ? 'bg-[var(--primaryBlue)] text-white' : 'text-[var(--contentMain)] hover:bg-[var(--bgTertiary)]'}`}
                 onClick={() => navigate(menu.path)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                  location.pathname === menu.path
+                    ? 'bg-[var(--primaryBlue)] text-white'
+                    : 'text-[var(--contentMain)] hover:bg-[var(--bgTertiary)]'
+                } ${isCollapsed ? 'justify-center' : ''}`}
               >
-                {menu.icon} {menu.label}
+                <span className={`flex ${isCollapsed ? 'justify-center w-full' : ''}`}>
+                  <FontAwesomeIcon icon={menu.icon} className="w-5 h-5" />
+                </span>
+                {!isCollapsed && <span className="text-sm font-medium">{menu.label}</span>}
               </button>
             </li>
           ))}
         </ul>
       </nav>
-      <div className="mt-auto text-xs text-[var(--contentCaption)] pt-8">Copyright © 2024 만나식권. All rights reserved.</div>
+
+      <div className="p-4 border-t border-[var(--borderOutline)]">
+        {!isCollapsed && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-[var(--bgTertiary)]">
+              <FontAwesomeIcon icon={faUser} className="w-5 h-5 text-[var(--contentMain)]" />
+              <span className="text-sm font-medium text-[var(--contentMain)]">관리자</span>
+            </div>
+            <button 
+              onClick={() => navigate('/login')} 
+              className="flex items-center gap-2 p-2 rounded-lg border border-[var(--borderOutline)] hover:bg-[var(--bgTertiary)] transition-colors"
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} className="w-5 h-5 text-[var(--primaryBlue)]" />
+              <span className="text-sm font-medium text-[var(--primaryBlue)]">로그아웃</span>
+            </button>
+          </div>
+        )}
+      </div>
     </aside>
   );
 } 

@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { MdDownload, MdQrCode2, MdSearch, MdCheck, MdClose, MdVisibility } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faDownload,
+  faQrcode,
+  faMagnifyingGlass,
+  faCheck,
+  faXmark,
+  faEye
+} from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
 const statCards = [
@@ -50,8 +58,10 @@ export default function Reservations() {
             <option value="이번주">이번주</option>
             <option value="이번달">이번달</option>
           </select>
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><MdDownload size={18}/> 예약 현황 내보내기</button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => navigate('/qr')}><MdQrCode2 size={18}/> QR 미제출자 확인</button>
+          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]">
+            <FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 예약 현황 내보내기
+          </button>
+          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => navigate('/qr')}><FontAwesomeIcon icon={faQrcode} className="w-5 h-5" /> QR 미제출자 확인</button>
         </div>
       </div>
       {/* 통계 카드 */}
@@ -84,7 +94,7 @@ export default function Reservations() {
         <div className="flex gap-2 items-center mb-4">
           <div className="relative">
             <input type="text" className="pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" style={{width:220}} placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
-            <MdSearch size={18} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
           </div>
           <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--white)] text-sm" value={mealFilter} onChange={e => setMealFilter(e.target.value)} style={{width:100}}>
             <option value="전체">전체</option>
@@ -125,7 +135,7 @@ export default function Reservations() {
                     <span className={`px-2 py-1 rounded text-xs font-bold ${r.status === '확정' ? 'bg-[var(--green100)] text-[var(--green500)]' : 'bg-[var(--bgTertiary)] text-[var(--contentCaption)]'}`}>{r.status}</span>
                   </td>
                   <td className="py-2 text-center">
-                    {r.qr ? <MdCheck size={18} className="inline text-[var(--primaryBlue)]" /> : <MdClose size={18} className="inline text-[var(--red500)]" />}
+                    {r.qr ? <FontAwesomeIcon icon={faCheck} className="inline text-[var(--primaryBlue)]" /> : <FontAwesomeIcon icon={faXmark} className="inline text-[var(--red500)]" />}
                   </td>
                   {tab === 0 && <td className="py-2 text-center">{r.time}</td>}
                   <td className="py-2 text-center">
@@ -133,11 +143,11 @@ export default function Reservations() {
                       <div className="flex justify-center gap-2">
                         <button className="px-3 py-1 rounded bg-[var(--primaryBlue)] text-white text-xs font-semibold hover:bg-[var(--blue700)] transition">승인</button>
                         <button className="px-3 py-1 rounded bg-[var(--red100)] text-[var(--red500)] text-xs font-semibold hover:bg-[var(--red200)] transition">거절</button>
-                        <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><MdVisibility size={18}/></button>
+                        <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faEye} className="w-5 h-5" /></button>
                       </div>
                     ) : (
                       <>
-                        <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><MdVisibility size={18}/></button>
+                        <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faEye} className="w-5 h-5" /></button>
                       </>
                     )}
                   </td>

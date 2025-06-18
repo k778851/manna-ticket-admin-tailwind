@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { MdRestaurantMenu, MdAdd, MdUpload, MdWbSunny, MdCloud, MdGrain, MdAcUnit, MdLocalDining, MdEdit, MdClose } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faUtensils,
+  faPlus,
+  faUpload,
+  faSun,
+  faCloud,
+  faWheatAlt,
+  faSnowflake,
+  faBowlFood,
+  faPenToSquare,
+  faXmark,
+  faEye
+} from '@fortawesome/free-solid-svg-icons';
 
 const todayMenus = [
   {
@@ -103,15 +116,15 @@ export default function Menu() {
       <div className="flex items-center justify-between px-10 pt-10 pb-4">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">식단 메뉴 관리</h1>
         <div className="flex gap-2">
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><MdUpload size={18}/> 메뉴 일괄 업로드</button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => { setModalType('today'); setModalOpen(true); }}><MdAdd size={18}/> 메뉴 추가</button>
+          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><FontAwesomeIcon icon={faUpload} size="lg" /> 메뉴 일괄 업로드</button>
+          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => { setModalType('today'); setModalOpen(true); }}><FontAwesomeIcon icon={faPlus} size="lg" /> 메뉴 추가</button>
         </div>
       </div>
       {/* 메뉴 등록 모달 */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white rounded-lg shadow-lg p-8 w-[90vw] max-w-none flex flex-col gap-4 relative">
-            <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-700" onClick={() => setModalOpen(false)}><MdClose size={24}/></button>
+            <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-700" onClick={() => setModalOpen(false)}><FontAwesomeIcon icon={faXmark} size="lg" /></button>
             <div className="flex gap-2 mb-2">
               <button className={`flex-1 py-2 rounded ${modalType==='today' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={()=>setModalType('today')}>오늘의 메뉴 등록</button>
               <button className={`flex-1 py-2 rounded ${modalType==='week' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={()=>setModalType('week')}>주간 메뉴 등록</button>
@@ -191,7 +204,7 @@ export default function Menu() {
           {todayMenusState.map((menu, idx) => (
             <div key={idx} className="bg-white rounded-[var(--radius-l)] shadow-sm p-8 border border-[var(--borderOutline)] flex flex-col min-h-[320px]">
               <div className="flex items-center gap-2 mb-2">
-                <MdRestaurantMenu className="text-[var(--contentCaption)]" size={20}/>
+                <FontAwesomeIcon icon={faUtensils} className="w-5 h-5 text-[var(--contentCaption)]" />
                 <span className="font-bold text-lg text-[var(--contentMain)]">{menu.type}</span>
               </div>
               <div className="text-xs text-[var(--contentCaption)] mb-2">{menu.date}</div>
@@ -231,8 +244,8 @@ export default function Menu() {
                 <option value="다음 주">다음 주</option>
                 <option value="지난 주">지난 주</option>
               </select>
-              <button className="px-4 py-2 rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold flex items-center gap-1 shadow-sm hover:bg-[var(--bgTertiary)] transition"><MdEdit size={18}/> <span>주간 메뉴 편집</span></button>
-              <button className="px-4 py-2 rounded bg-[var(--primaryBlue)] text-white text-sm font-semibold flex items-center gap-1 shadow-sm" onClick={()=>{ setModalType('week'); setModalOpen(true); }}><MdAdd size={18}/> <span>주간 메뉴 생성</span></button>
+              <button className="px-4 py-2 rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold flex items-center gap-1 shadow-sm hover:bg-[var(--bgTertiary)] transition"><FontAwesomeIcon icon={faPenToSquare} size="lg" /> <span>주간 메뉴 편집</span></button>
+              <button className="px-4 py-2 rounded bg-[var(--primaryBlue)] text-white text-sm font-semibold flex items-center gap-1 shadow-sm" onClick={()=>{ setModalType('week'); setModalOpen(true); }}><FontAwesomeIcon icon={faPlus} size="lg" /> <span>주간 메뉴 생성</span></button>
             </div>
           </div>
           <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] overflow-x-auto">
@@ -262,8 +275,8 @@ export default function Menu() {
                       <div className="text-[var(--contentCaption)] text-xs mt-1">{row.dinner.kcal}kcal</div>
                     </td>
                     <td className="py-3 px-2 text-center">
-                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536M9 13l6.071-6.071a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-1.414.828l-4.243 1.414 1.414-4.243a4 4 0 01.828-1.414z"></path></svg></button>
-                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="미리보기"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="미리보기"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
                     </td>
                   </tr>
                 ))}
