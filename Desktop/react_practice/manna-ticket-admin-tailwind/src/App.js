@@ -11,6 +11,7 @@ import Sponser from './pages/Sponser';
 import Settings from './pages/Settings';
 import Help from './pages/Help';
 import Login from './pages/Login';
+import Icons from './pages/Icons';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 768);
@@ -64,6 +65,7 @@ function MainLayout() {
           <Route path="/sponser" element={<Sponser />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/icons" element={<Icons />} />
         </Routes>
       </main>
     </div>
