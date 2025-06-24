@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { MdFavoriteBorder, MdCheck, MdFileUpload, MdRemoveRedEye, MdEdit, MdDelete, MdAdd, MdDownload } from 'react-icons/md';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faHeart,
+  faCheck,
+  faUpload,
+  faEye,
+  faPenToSquare,
+  faTrash,
+  faPlus,
+  faDownload,
+  faMagnifyingGlass
+} from '@fortawesome/free-solid-svg-icons';
 
 const sponsorStats = [
-  { label: '전체 게시글', value: 4, icon: <MdFavoriteBorder className="text-[var(--contentCaption)]" /> },
-  { label: '감사 인사', value: 2, icon: <MdCheck className="text-[var(--green500)]" /> },
-  { label: '고정 게시글', value: 2, icon: <MdFileUpload className="text-[var(--contentCaption)]" /> },
-  { label: '총 조회수', value: 876, icon: <MdRemoveRedEye className="text-[var(--contentCaption)]" /> },
+  { label: '전체 게시글', value: 4, icon: <FontAwesomeIcon icon={faHeart} className="text-[var(--contentCaption)]" /> },
+  { label: '고정 게시글', value: 2, icon: <FontAwesomeIcon icon={faUpload} className="text-[var(--contentCaption)]" /> },
 ];
 
 const posts = [
@@ -21,12 +30,19 @@ const previewPosts = [
   { id: 3, title: '익명 후원자님께 특별한 감사글', isNew: false, isFixed: true, content: '큰 금액을 후원해주신 익명의 후원자님께 진심으로 감사드립니다. 더 나은 식사 환경을 만드는 데 소중히 사용하겠습니다.', category: '감사인사', views: 289, date: '2024-01-08' },
 ];
 
+// 고정 게시글 먼저, 날짜 내림차순 정렬
+const sortedPosts = [...posts].sort((a, b) => {
+  if (a.isFixed && !b.isFixed) return -1;
+  if (!a.isFixed && b.isFixed) return 1;
+  return new Date(b.date) - new Date(a.date);
+});
+
 export default function Sponser() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('전체');
   const [status, setStatus] = useState('전체');
 
-  const filtered = posts.filter(
+  const filtered = sortedPosts.filter(
     p => (!search || p.title.includes(search)) &&
       (category === '전체' || p.category === category) &&
       (status === '전체' || p.status === status)
@@ -38,12 +54,12 @@ export default function Sponser() {
       <div className="flex items-center justify-between px-10 pt-10 pb-2 mb-6">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">후원 현황 관리</h1>
         <div className="flex gap-2">
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><MdDownload size={18}/> 게시글 내보내기</button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2"><MdAdd size={18}/> 감사 게시글 작성</button>
+          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 게시글 내보내기</button>
+          <button className="button-primary-m flex items-center gap-1 px-4 py-2"><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 감사 게시글 작성</button>
         </div>
       </div>
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-10 mb-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-10 mb-8 w-full">
         {sponsorStats.map(stat => (
           <div key={stat.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col items-end md:items-start border border-[var(--borderOutline)] min-h-[80px]">
             <div className="flex items-center gap-1 text-[var(--contentCaption)] text-sm font-semibold w-full justify-between">
@@ -61,7 +77,7 @@ export default function Sponser() {
         <div className="flex gap-2 items-center mb-4">
           <div className="relative flex-1 max-w-xs">
             <input type="text" className="w-full pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" placeholder="게시글 검색..." value={search} onChange={e => setSearch(e.target.value)} />
-            <svg className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
           </div>
           <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--bgPrimary)] text-sm" value={category} onChange={e => setCategory(e.target.value)} style={{width:100}}>
             <option value="전체">전체</option>
@@ -80,7 +96,6 @@ export default function Sponser() {
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
                 <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-left">제목</th>
-                <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">카테고리</th>
                 <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">작성자</th>
                 <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">상태</th>
                 <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">조회수</th>
@@ -89,29 +104,32 @@ export default function Sponser() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(p => (
-                <tr key={p.id} className="border-b last:border-b-0">
-                  <td className="py-3 px-2 text-left font-medium text-[var(--contentMain)]">
-                    {p.title}
-                    {p.isNew && <span className="ml-2 bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
-                    {p.isFixed && <span className="ml-2 bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
-                  </td>
-                  <td className="py-3 px-2 text-center">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${p.category === '감사인사' ? 'bg-[var(--green100)] text-[var(--green500)]' : p.category === '보고서' ? 'bg-[var(--blue100)] text-[var(--primaryBlue)]' : 'bg-[var(--bgTertiary)] text-[var(--contentCaption)]'}`}>{p.category}</span>
-                  </td>
-                  <td className="py-3 px-2 text-center">{p.author}</td>
-                  <td className="py-3 px-2 text-center">
-                    <span className="px-2 py-1 rounded text-xs font-bold bg-[var(--green100)] text-[var(--green500)]">{p.status}</span>
-                  </td>
-                  <td className="py-3 px-2 text-center">{p.views}회</td>
-                  <td className="py-3 px-2 text-center">{p.date}</td>
-                  <td className="py-3 px-2 text-center">
-                    <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><MdRemoveRedEye size={18}/></button>
-                    <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><MdEdit size={18}/></button>
-                    <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><MdDelete size={18}/></button>
-                  </td>
-                </tr>
-              ))}
+              {filtered
+                .sort((a, b) => {
+                  if (a.isFixed && !b.isFixed) return -1;
+                  if (!a.isFixed && b.isFixed) return 1;
+                  return new Date(b.date) - new Date(a.date);
+                })
+                .map(p => (
+                  <tr key={p.id} className="border-b last:border-b-0">
+                    <td className="py-3 px-2 text-left font-medium text-[var(--contentMain)]">
+                      {p.title}
+                      {p.isNew && <span className="ml-2 bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
+                      {p.isFixed && <span className="ml-2 bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
+                    </td>
+                    <td className="py-3 px-2 text-center">{p.author}</td>
+                    <td className="py-3 px-2 text-center">
+                      <span className="px-2 py-1 rounded text-xs font-bold bg-[var(--green100)] text-[var(--green500)]">{p.status}</span>
+                    </td>
+                    <td className="py-3 px-2 text-center">{p.views}회</td>
+                    <td className="py-3 px-2 text-center">{p.date}</td>
+                    <td className="py-3 px-2 text-center">
+                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
+                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                      <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -137,9 +155,9 @@ export default function Sponser() {
                 </div>
               </div>
               <div className="flex gap-2 mt-2 md:mt-0">
-                <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><MdRemoveRedEye size={18}/></button>
-                <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><MdEdit size={18}/></button>
-                <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><MdDelete size={18}/></button>
+                <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
+                <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
               </div>
             </div>
           ))}

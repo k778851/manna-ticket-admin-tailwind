@@ -10,14 +10,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
-const statCards = [
-  { label: '오늘 점심', value: 45 },
-  { label: '오늘 저녁', value: 38 },
-  { label: '일반 신청', value: 2 },
-  { label: '추가 신청', value: 3 },
-  { label: 'QR 미제출', value: 8 },
-];
-
 const regularReservations = [
   { id: 1, user: '김철수', date: '2024-01-15', meal: '점심', status: '확정', qr: true, time: '12:30' },
   { id: 2, user: '박민수', date: '2024-01-15', meal: '점심', status: '확정', qr: false, time: '-' },
@@ -29,9 +21,24 @@ const additionalReservations = [
   { id: 3, user: '최영호', date: '2024-01-15', meal: '점심', count: 3, reason: '외부 방문객 접대', status: '확정', qr: true },
 ];
 
+// 일반 예약 점심/저녁 개수 계산
+const regularLunchCount = regularReservations.filter(r => r.meal === '점심').length;
+const regularDinnerCount = regularReservations.filter(r => r.meal === '저녁').length;
+// 추가 예약 점심/저녁 개수 계산
+const additionalLunchCount = additionalReservations.filter(r => r.meal === '점심').length;
+const additionalDinnerCount = additionalReservations.filter(r => r.meal === '저녁').length;
+
 const customTabs = [
   { label: `일반 신청 (${regularReservations.length})`, value: 0 },
   { label: `추가 신청 (${additionalReservations.length})`, value: 1 },
+];
+
+const statCards = [
+  { label: '오늘 점심', value: 45 },
+  { label: '오늘 저녁', value: 38 },
+  { label: '일반 신청', value: `${regularLunchCount} / ${regularDinnerCount}` },
+  { label: '추가 신청', value: `${additionalLunchCount} / ${additionalDinnerCount}` },
+  { label: 'QR 미제출', value: 8 },
 ];
 
 export default function Reservations() {
@@ -69,7 +76,7 @@ export default function Reservations() {
         {statCards.map((card, idx) => (
           <div key={card.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col items-center border border-[var(--borderOutline)] min-h-[80px]">
             <div className="text-[var(--contentCaption)] text-sm">{card.label}</div>
-            <div className={`text-2xl font-bold mt-1 ${idx===2? 'text-[var(--primaryBlue)]' : idx===3? 'text-[var(--yellow500)]' : idx===4? 'text-[var(--red500)]' : 'text-[var(--contentMain)]'}`}>{card.value}</div>
+            <div className={`text-2xl font-bold mt-1 ${card.label.includes('일반') ? 'text-[var(--primaryBlue)]' : card.label.includes('추가') ? 'text-[var(--yellow500)]' : card.label.includes('QR') ? 'text-[var(--red500)]' : 'text-[var(--contentMain)]'}`}>{card.value}</div>
           </div>
         ))}
       </div>
@@ -120,7 +127,7 @@ export default function Reservations() {
                 <th className="font-bold text-[var(--contentMain)] py-2 text-center">상태</th>
                 <th className="font-bold text-[var(--contentMain)] py-2 text-center">QR 제출</th>
                 {tab === 0 && <th className="font-bold text-[var(--contentMain)] py-2 text-center">제출 시간</th>}
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">작업</th>
+                {tab === 1 && <th className="font-bold text-[var(--contentMain)] py-2 text-center">작업</th>}
               </tr>
             </thead>
             <tbody>
@@ -138,19 +145,14 @@ export default function Reservations() {
                     {r.qr ? <FontAwesomeIcon icon={faCheck} className="inline text-[var(--primaryBlue)]" /> : <FontAwesomeIcon icon={faXmark} className="inline text-[var(--red500)]" />}
                   </td>
                   {tab === 0 && <td className="py-2 text-center">{r.time}</td>}
-                  <td className="py-2 text-center">
-                    {tab === 1 ? (
+                  {tab === 1 && (
+                    <td className="py-2 text-center">
                       <div className="flex justify-center gap-2">
                         <button className="px-3 py-1 rounded bg-[var(--primaryBlue)] text-white text-xs font-semibold hover:bg-[var(--blue700)] transition">승인</button>
                         <button className="px-3 py-1 rounded bg-[var(--red100)] text-[var(--red500)] text-xs font-semibold hover:bg-[var(--red200)] transition">거절</button>
-                        <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faEye} className="w-5 h-5" /></button>
                       </div>
-                    ) : (
-                      <>
-                        <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faEye} className="w-5 h-5" /></button>
-                      </>
-                    )}
-                  </td>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

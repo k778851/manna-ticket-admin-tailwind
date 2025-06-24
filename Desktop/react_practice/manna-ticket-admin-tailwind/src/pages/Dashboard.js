@@ -5,12 +5,19 @@ import { Bar } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { useNavigate } from 'react-router-dom';
 import Switch from "react-switch";
-Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+import QRNotSubmittedTable from '../components/QRNotSubmittedTable';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
 // CSS 변수값을 실제 색상값으로 변환하는 헬퍼
 function getVarColor(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
+
+const notSubmitted = [
+  { id: 1, user: '이영희', meal: '저녁', time: '18:00', count: 3, status: '경고' },
+  { id: 2, user: '박민수', meal: '점심', time: '12:00', count: 1, status: '정상' },
+];
 
 export default function Dashboard() {
   const [timeRange, setTimeRange] = useState('week');
@@ -21,6 +28,7 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   const intervalOptions = [5, 10, 30, 60, 300];
 
@@ -184,6 +192,13 @@ export default function Dashboard() {
             return `${context.dataset.label}: ${value}명`;
           }
         }
+      },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: chartColors.main,
+        font: { weight: 'bold', size: 14 },
+        formatter: (value) => `${value}명`
       }
     },
     scales: {
@@ -225,11 +240,11 @@ export default function Dashboard() {
   return (
     <div className="dashboard-page">
       {/* Dashboard Title & Actions */}
-      <div className="bg-[var(--bgSecondary)] px-10 py-7 flex flex-col gap-5">
-        <div className="flex items-center justify-between">
+      <div className="bg-[var(--bgSecondary)] px-2 sm:px-10 py-7 flex flex-col gap-5">
+                  <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-[var(--contentMain)] tracking-tight">대시보드</h1>
-            <span className="bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs rounded px-2 py-1 ml-2">ver 1.2.0</span>
+            {/* <span className="bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs rounded px-2 py-1 ml-2">ver 1.2.0</span> */}
           </div>
           <select
             value={statsPeriod}
@@ -243,48 +258,45 @@ export default function Dashboard() {
           </select>
         </div>
         
-        {/* 자동 갱신 설정 카드 */}
-        <div className="mb-6">
-          <div className="bg-white rounded-xl shadow p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="font-semibold text-[var(--contentMain)] mb-2 sm:mb-0">자동 갱신 설정</div>
-            <div className="flex flex-wrap items-center gap-4">
-              <label className="flex items-center gap-1 text-sm">
-                <span>자동 갱신</span>
+                  {/* 자동 갱신 설정 카드 */}
+          <div className="w-full bg-white rounded-[var(--radius-m)] shadow-sm p-4 sm:p-6 border border-[var(--borderOutline)]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm text-[var(--contentMain)]">자동 갱신</span>
                 <Switch
-                  onChange={setAutoRefresh}
                   checked={autoRefresh}
-                  height={20}
-                  width={40}
+                  onChange={setAutoRefresh}
                   onColor="#3182f6"
-                  uncheckedIcon={false}
+                  offColor="#e6e8ea"
                   checkedIcon={false}
+                  uncheckedIcon={false}
+                  height={20}
+                  width={36}
                 />
-              </label>
-              <label className="flex items-center gap-1 text-sm">
-                <span>주기</span>
+                <span className="text-sm text-[var(--contentCaption)]">주기</span>
                 <select
                   value={intervalSec}
                   onChange={e => setIntervalSec(Number(e.target.value))}
-                  className="px-2 py-1 border rounded text-sm"
+                  className="px-2 py-1 rounded border text-sm text-[var(--contentMain)] bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  style={{ width: 100 }}
                 >
-                  {intervalOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt === 60 ? '1분' : opt === 300 ? '5분' : `${opt}초`}</option>
+                  {intervalOptions.map(sec => (
+                    <option key={sec} value={sec}>{sec}초</option>
                   ))}
                 </select>
-              </label>
+              </div>
               <button
                 onClick={handleManualRefresh}
-                className="px-3 py-1 rounded bg-[var(--primaryBlue)] text-white text-sm font-medium hover:bg-blue-700 transition"
+                className="px-4 py-2 rounded-lg bg-white border border-[var(--borderOutline)] text-[var(--contentMain)] text-sm font-medium hover:bg-[var(--bgSecondary)] transition-colors duration-200 flex items-center gap-2"
               >
-                즉시 새로고침
+                <span>즉시 새로고침</span>
               </button>
             </div>
           </div>
-        </div>
 
         {/* Summary Cards */}
-        <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-5">
-          <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col gap-2 border border-[var(--borderOutline)] min-h-[100px]">
+                  <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+            <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col gap-2 border border-[var(--borderOutline)] min-h-[100px]">
             <div className="flex items-center gap-2 text-[var(--contentCaption)] text-xs">
               <FontAwesomeIcon icon={faUsers} className="w-4 h-4" /> 총 예약자
             </div>
@@ -296,14 +308,14 @@ export default function Dashboard() {
               <FontAwesomeIcon icon={faCalendarDays} className="w-4 h-4" /> 점심/저녁 예약자
             </div>
             <div className="text-2xl font-bold text-[var(--contentMain)]">{stat.lunch} / {stat.dinner}</div>
-            <div className="text-xs text-[var(--contentCaption)]">점심 / 저녁 예약자</div>
+            <div className="text-xs text-[var(--contentCaption)]">점심 / 저녁 </div>
           </div>
           <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col gap-2 border border-[var(--borderOutline)] min-h-[100px]">
             <div className="flex items-center gap-2 text-[var(--contentCaption)] text-xs">
               <FontAwesomeIcon icon={faQrcode} className="w-4 h-4" /> QR 제출자(점심/저녁)
             </div>
             <div className="text-2xl font-bold text-[var(--contentMain)]">{stat.qrLunch} / {stat.qrDinner}</div>
-            <div className="text-xs text-[var(--contentCaption)]">점심 / 저녁 QR 제출자</div>
+            <div className="text-xs text-[var(--contentCaption)]">점심 / 저녁 QR </div>
           </div>
           <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col gap-2 border border-[var(--borderOutline)] min-h-[100px]">
             <div className="flex items-center gap-2 text-[var(--contentCaption)] text-xs">
@@ -316,41 +328,56 @@ export default function Dashboard() {
       </div>
 
       {/* Main Chart */}
-      <div className="flex-1 bg-[var(--bgSecondary)] px-10 pb-10">
-        <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 border border-[var(--borderOutline)] min-h-[400px] flex flex-col">
-          <div className="flex items-center justify-between mb-4">
+      <div className="flex-1 bg-[var(--bgSecondary)] px-2 sm:px-10 pb-10">
+                  <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-2 sm:p-6 border border-[var(--borderOutline)] min-h-[320px] flex flex-col">
+          <div className="flex items-center justify-between mb-2 sm:mb-4">
             <div className="font-semibold text-[var(--contentMain)]">예약자/QR 인증 현황</div>
           </div>
-          <div className="flex-1 flex items-center justify-center text-[var(--contentCaption)] min-h-[320px]">
-            {barData && <Bar data={barData} options={barOptions} height={320} />}
+          <div className="flex-1 flex items-center justify-center text-[var(--contentCaption)] min-h-[220px] sm:min-h-[320px] w-full overflow-x-auto">
+            <div className="w-full h-full" style={{minWidth: 280}}>
+              {barData && <Bar data={barData} options={barOptions} height={220} />}
+            </div>
           </div>
         </div>
       </div>
 
       {/* QR 미제출자 전체 너비 카드 */}
-      <div className="w-full px-10 pb-10">
-        <div className="bg-gradient-to-r from-[#fff7ec] to-white rounded-[var(--radius-m)] shadow-sm p-6 border-l-4 border-[var(--orange400)] flex items-center justify-between">
-          <div className="flex items-start gap-4">
+      <div className="w-full px-2 sm:px-10 pb-10">
+                  <div className="bg-gradient-to-r from-[#fff7ec] to-white rounded-[var(--radius-m)] shadow-sm p-4 sm:p-6 border-l-4 border-[var(--orange400)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3 sm:gap-4">
             <div className="bg-[var(--orange100)] rounded-full p-2">
               <FontAwesomeIcon icon={faTriangleExclamation} className="w-6 h-6 text-[var(--orange500)]" />
+              {/* import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'; */}
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-[var(--contentMain)]">QR 미제출자</span>
-                <span className="text-2xl font-bold text-[var(--contentError)]">8명</span>
+                <span className="font-semibold text-[var(--contentMain)] text-base sm:text-lg">QR 미제출자</span>
+                <span className="text-xl sm:text-2xl font-bold text-[var(--contentError)]">8명</span>
               </div>
-              <div className="text-sm text-[var(--contentCaption)]">오늘 실사 예약 중 QR 미제출</div>
+              <div className="text-xs sm:text-sm text-[var(--contentCaption)]">오늘 식사 예약 중 QR 미제출 / 식사 예약을 하지 않고 QR코드 제출한 사용자</div>
             </div>
           </div>
           <button
-            className="px-4 py-2 rounded-lg bg-white border border-[var(--orange400)] text-[var(--orange500)] text-sm font-medium hover:bg-[var(--orange50)] transition-colors duration-200 flex items-center gap-2 shadow-sm"
-            onClick={() => navigate('/qr')}
+            className="mt-3 sm:mt-0 px-4 py-2 rounded-lg bg-white border border-[var(--orange400)] text-[var(--orange500)] text-sm font-medium hover:bg-[var(--orange50)] transition-colors duration-200 flex items-center gap-2 shadow-sm"
+            onClick={() => setQrModalOpen(true)}
           >
             <span>미제출자 확인</span>
             <FontAwesomeIcon icon={faQrcode} className="w-4 h-4" />
           </button>
         </div>
       </div>
+
+      {/* QR 미제출자 모달 */}
+      {qrModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-lg mx-2 relative">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl" onClick={() => setQrModalOpen(false)}>&times;</button>
+            <div className="font-bold text-[var(--contentMain)] mb-2 text-lg">QR 미제출자 명단</div>
+            <div className="text-xs text-[var(--contentCaption)] mb-3">식사 예약 후 QR 코드를 제출하지 않은 사용자 목록</div>
+            <QRNotSubmittedTable notSubmitted={notSubmitted} />
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

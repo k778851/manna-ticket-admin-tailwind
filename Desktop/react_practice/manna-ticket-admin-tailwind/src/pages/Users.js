@@ -9,48 +9,40 @@ import {
   faMagnifyingGlass 
 } from '@fortawesome/free-solid-svg-icons';
 
-const statCards = [
-  { label: '전체 사용자', value: 156 },
-  { label: '활성 사용자', value: 142 },
-  { label: '비활성 사용자', value: 14 },
-  { label: '이번 주 신규', value: 8 },
-];
 
 const initialUsers = [
-  { id: 1, name: '김철수', personalNumber: '00371210-00149', status: '활성', count: 23, qr: 95, lastLogin: '2024-01-15' },
-  { id: 2, name: '이영희', personalNumber: '00371210-00150', status: '비활성', count: 15, qr: 87, lastLogin: '2024-01-10' },
-  { id: 3, name: '박민수', personalNumber: '00371210-00151', status: '활성', count: 31, qr: 100, lastLogin: '2024-01-14' },
+  { id: 1, name: '김철수', personalNumber: '00371210-00149', department: '총무팀', lunchCount: 12, dinnerCount: 11, qr: 95 },
+  { id: 2, name: '이영희', personalNumber: '00371210-00150', department: '기획팀', lunchCount: 8, dinnerCount: 7, qr: 87 },
+  { id: 3, name: '박민수', personalNumber: '00371210-00151', department: '영업팀', lunchCount: 16, dinnerCount: 15, qr: 100 },
 ];
 
 export default function Users() {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('전체');
   const [users, setUsers] = useState(initialUsers);
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', personalNumber: '', status: '활성' });
+  const [form, setForm] = useState({ name: '', personalNumber: '', department: '' });
 
   const filteredUsers = users.filter(
     (u) =>
-      (filter === '전체' || u.status === filter) &&
       (!search || u.name.includes(search) || u.personalNumber.includes(search))
   );
 
   const handleAddUser = (e) => {
     e.preventDefault();
-    if (!form.name || !form.personalNumber) return;
+    if (!form.name || !form.personalNumber || !form.department) return;
     setUsers([
       ...users,
       {
         id: users.length + 1,
         name: form.name,
         personalNumber: form.personalNumber,
-        status: form.status,
-        count: 0,
+        department: form.department,
+        lunchCount: 0,
+        dinnerCount: 0,
         qr: 0,
-        lastLogin: '-',
       },
     ]);
-    setForm({ name: '', personalNumber: '', status: '활성' });
+    setForm({ name: '', personalNumber: '', department: '' });
     setModalOpen(false);
   };
 
@@ -78,20 +70,20 @@ export default function Users() {
             />
             <input
               className="border border-[var(--borderInput)] rounded px-3 py-2 text-sm"
-              placeholder="이메일"
-              type="number"
+              placeholder="고유번호"
+              type="text"
               value={form.personalNumber}
               onChange={e => setForm({ ...form, personalNumber: e.target.value })}
               required
             />
-            <select
+            <input
               className="border border-[var(--borderInput)] rounded px-3 py-2 text-sm"
-              value={form.status}
-              onChange={e => setForm({ ...form, status: e.target.value })}
-            >
-              <option value="활성">활성</option>
-              <option value="비활성">비활성</option>
-            </select>
+              placeholder="부서"
+              type="text"
+              value={form.department}
+              onChange={e => setForm({ ...form, department: e.target.value })}
+              required
+            />
             <div className="flex gap-2 mt-2">
               <button type="button" className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" onClick={() => setModalOpen(false)}>취소</button>
               <button type="submit" className="flex-1 py-2 rounded bg-blue-500 text-white font-semibold">저장</button>
@@ -99,40 +91,26 @@ export default function Users() {
           </form>
         </div>
       )}
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5 px-10 pb-6">
-        {statCards.map(card => (
-          <div key={card.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col items-center border border-[var(--borderOutline)] min-h-[80px]">
-            <div className="text-[var(--contentCaption)] text-sm">{card.label}</div>
-            <div className="text-2xl font-bold text-[var(--contentMain)] mt-1">{card.value}</div>
-          </div>
-        ))}
-      </div>
       {/* 사용자 목록 */}
       <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 border border-[var(--borderOutline)] mx-10 mb-10">
         <div className="font-bold text-[var(--contentMain)] mb-1">사용자 목록</div>
-        <div className="text-sm text-[var(--contentCaption)] mb-3">등록된 모든 사용자를 관리할 수 있습니다.</div>
+        <div className="text-sm text-[var(--contentCaption)] mb-3">등록된 모든 사용자를 관리할 수 있습니다.<br/>점심/저녁 예약수는 매월 1일 자동 초기화됩니다.</div>
         <div className="flex gap-2 items-center mb-4">
           <div className="relative">
             <input type="text" className="w-full pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" style={{width:220}} placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
             <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
           </div>
-          <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--white)] text-sm" value={filter} onChange={e => setFilter(e.target.value)} style={{width:100}}>
-            <option value="전체">전체</option>
-            <option value="활성">활성</option>
-            <option value="비활성">비활성</option>
-          </select>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
                 <th className="font-bold text-[var(--contentMain)] py-2">이름</th>
-                <th className="font-bold text-[var(--contentMain)] py-2">이메일</th>
-                <th className="font-bold text-[var(--contentMain)] py-2">상태</th>
-                <th className="font-bold text-[var(--contentMain)] py-2">예약 횟수</th>
+                <th className="font-bold text-[var(--contentMain)] py-2">고유번호</th>
+                <th className="font-bold text-[var(--contentMain)] py-2">부서</th>
+                <th className="font-bold text-[var(--contentMain)] py-2">점심 예약</th>
+                <th className="font-bold text-[var(--contentMain)] py-2">저녁 예약</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">QR 제출률</th>
-                <th className="font-bold text-[var(--contentMain)] py-2">최근 로그인</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">작업</th>
               </tr>
             </thead>
@@ -141,10 +119,9 @@ export default function Users() {
                 <tr key={row.id} className="border-b last:border-b-0">
                   <td className="py-2 text-center">{row.name}</td>
                   <td className="py-2 text-center">{row.personalNumber}</td>
-                  <td className="py-2 text-center">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${row.status === '활성' ? 'bg-[var(--green100)] text-[var(--green500)]' : 'bg-[var(--bgTertiary)] text-[var(--contentCaption)]'}`}>{row.status}</span>
-                  </td>
-                  <td className="py-2">{row.count}회</td>
+                  <td className="py-2 text-center">{row.department}</td>
+                  <td className="py-2">{row.lunchCount}회</td>
+                  <td className="py-2">{row.dinnerCount}회</td>
                   <td className="py-2 text-center">
                     <div className="flex items-center gap-2 justify-center">
                       <div className="w-20 h-2 bg-[var(--bgTertiary)] rounded">
@@ -153,10 +130,8 @@ export default function Users() {
                       <span className="font-bold text-[var(--contentMain)] min-w-[36px]">{row.qr}%</span>
                     </div>
                   </td>
-                  <td className="py-2 text-center">{row.lastLogin}</td>
                   <td className="py-2 text-center">
                     <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
-                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
                     <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
                   </td>
                 </tr>

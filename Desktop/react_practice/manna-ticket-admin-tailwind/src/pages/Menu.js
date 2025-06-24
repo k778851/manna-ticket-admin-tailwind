@@ -21,7 +21,6 @@ const todayMenus = [
     main: '소불고기',
     sides: '밥, 계란말이, 시금치나물, 김치',
     soup: '국',
-    kcal: 650,
     allergy: '대두, 계란',
   },
   {
@@ -30,7 +29,6 @@ const todayMenus = [
     main: '치킨까스',
     sides: '밥, 샐러드, 감자튀김',
     soup: '스프',
-    kcal: 720,
     allergy: '밀, 계란, 우유',
   },
 ];
@@ -38,28 +36,28 @@ const todayMenus = [
 const weekMenus = [
   {
     day: '월', date: '2024-01-15',
-    lunch: { main: '소불고기', type: '한식', sides: '밥, 계란말이 외', kcal: 650 },
-    dinner: { main: '치킨까스', type: '양식', sides: '밥, 샐러드 외', kcal: 720 },
+    lunch: { main: '소불고기', type: '한식', sides: '밥, 계란말이 외' },
+    dinner: { main: '치킨까스', type: '양식', sides: '밥, 샐러드 외' },
   },
   {
     day: '화', date: '2024-01-16',
-    lunch: { main: '짜장덮밥', type: '중식', sides: '단무지, 양파 외', kcal: 580 },
-    dinner: { main: '제육볶음', type: '한식', sides: '밥, 콩나물 외', kcal: 690 },
+    lunch: { main: '짜장덮밥', type: '중식', sides: '단무지, 양파 외' },
+    dinner: { main: '제육볶음', type: '한식', sides: '밥, 콩나물 외' },
   },
   {
     day: '수', date: '2024-01-17',
-    lunch: { main: '돈까스', type: '일식', sides: '밥, 미소시루 외', kcal: 750 },
-    dinner: { main: '스파게티', type: '양식', sides: '마늘빵, 샐러드', kcal: 680 },
+    lunch: { main: '돈까스', type: '일식', sides: '밥, 미소시루 외' },
+    dinner: { main: '스파게티', type: '양식', sides: '마늘빵, 샐러드' },
   },
   {
     day: '목', date: '2024-01-18',
-    lunch: { main: '갈비찜', type: '한식', sides: '밥, 나물 외', kcal: 720 },
-    dinner: { main: '탕수육', type: '중식', sides: '밥, 짜장 외', kcal: 800 },
+    lunch: { main: '갈비찜', type: '한식', sides: '밥, 나물 외' },
+    dinner: { main: '탕수육', type: '중식', sides: '밥, 짜장 외' },
   },
   {
     day: '금', date: '2024-01-19',
-    lunch: { main: '함박스테이크', type: '양식', sides: '밥, 감자 외', kcal: 670 },
-    dinner: { main: '김치찌개', type: '한식', sides: '밥, 계란말이 외', kcal: 590 },
+    lunch: { main: '함박스테이크', type: '양식', sides: '밥, 감자 외' },
+    dinner: { main: '김치찌개', type: '한식', sides: '밥, 계란말이 외' },
   },
 ];
 
@@ -75,15 +73,14 @@ export default function Menu() {
     main: '',
     sides: '',
     soup: '',
-    kcal: '',
     allergy: '',
   });
   const [weekForm, setWeekForm] = useState([
-    { day: '월', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-    { day: '화', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-    { day: '수', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-    { day: '목', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-    { day: '금', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
+    { day: '월', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+    { day: '화', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+    { day: '수', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+    { day: '목', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+    { day: '금', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
   ]);
 
   // 메뉴 추가 핸들러
@@ -91,9 +88,9 @@ export default function Menu() {
     e.preventDefault();
     setTodayMenus([
       ...todayMenusState,
-      { ...form, kcal: Number(form.kcal) },
+      { ...form },
     ]);
-    setForm({ type: '점심 메뉴', date: '', main: '', sides: '', soup: '', kcal: '', allergy: '' });
+    setForm({ type: '점심 메뉴', date: '', main: '', sides: '', soup: '', allergy: '' });
     setModalOpen(false);
   };
   // 주간 메뉴 추가 핸들러
@@ -101,11 +98,11 @@ export default function Menu() {
     e.preventDefault();
     setWeekMenus([...weekMenusState, ...weekForm]);
     setWeekForm([
-      { day: '월', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-      { day: '화', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-      { day: '수', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-      { day: '목', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
-      { day: '금', date: '', lunch: { main: '', type: '', sides: '', kcal: '' }, dinner: { main: '', type: '', sides: '', kcal: '' } },
+      { day: '월', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+      { day: '화', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+      { day: '수', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+      { day: '목', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
+      { day: '금', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
     ]);
     setModalOpen(false);
   };
@@ -138,8 +135,7 @@ export default function Menu() {
                 <input className="border rounded px-3 py-2 text-sm" placeholder="날짜 (예: 2024-01-15 | 한식)" value={form.date} onChange={e=>setForm({...form, date: e.target.value})} required/>
                 <input className="border rounded px-3 py-2 text-sm" placeholder="주요리" value={form.main} onChange={e=>setForm({...form, main: e.target.value})} required/>
                 <input className="border rounded px-3 py-2 text-sm" placeholder="반찬" value={form.sides} onChange={e=>setForm({...form, sides: e.target.value})} required/>
-                <input className="border rounded px-3 py-2 text-sm" placeholder="국물" value={form.soup} onChange={e=>setForm({...form, soup: e.target.value})}/>
-                <input className="border rounded px-3 py-2 text-sm" placeholder="칼로리 (예: 650)" type="number" value={form.kcal} onChange={e=>setForm({...form, kcal: e.target.value})} required/>
+                <input className="border rounded px-3 py-2 text-sm" placeholder="국물" value={form.soup} onChange={e=>setForm({...form, soup: e.target.value})}/> 
                 <input className="border rounded px-3 py-2 text-sm" placeholder="알레르기 정보" value={form.allergy} onChange={e=>setForm({...form, allergy: e.target.value})}/>
                 <div className="flex gap-2 mt-2">
                   <button type="button" className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" onClick={()=>setModalOpen(false)}>취소</button>
@@ -160,14 +156,12 @@ export default function Menu() {
                         <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 주요리" value={row.lunch.main} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.main = e.target.value; setWeekForm(copy); }} required/>
                         <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 종류" value={row.lunch.type} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.type = e.target.value; setWeekForm(copy); }} required/>
                         <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 반찬" value={row.lunch.sides} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.sides = e.target.value; setWeekForm(copy); }} required/>
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 kcal" type="number" value={row.lunch.kcal} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.kcal = e.target.value; setWeekForm(copy); }} required/>
                       </div>
                       <div className="text-xs text-gray-500 mb-1 mt-2">저녁</div>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
                         <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 주요리" value={row.dinner.main} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.main = e.target.value; setWeekForm(copy); }} required/>
                         <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 종류" value={row.dinner.type} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.type = e.target.value; setWeekForm(copy); }} required/>
                         <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 반찬" value={row.dinner.sides} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.sides = e.target.value; setWeekForm(copy); }} required/>
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 kcal" type="number" value={row.dinner.kcal} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.kcal = e.target.value; setWeekForm(copy); }} required/>
                       </div>
                     </div>
                   ))}
@@ -222,7 +216,6 @@ export default function Menu() {
                 <div className="text-[var(--contentMain)]">{menu.soup}</div>
               </div>
               <div className="flex justify-between text-sm mt-auto">
-                <span>칼로리: {menu.kcal}kcal</span>
                 <span>알레르기: {menu.allergy}</span>
               </div>
               <div className="flex gap-2 mt-4">
@@ -267,12 +260,10 @@ export default function Menu() {
                     <td className="py-3 px-2">
                       <div className="font-bold text-[var(--contentMain)] flex items-center gap-2">{row.lunch.main} <span className="badge bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs px-2 py-0.5 rounded">{row.lunch.type}</span></div>
                       <div className="text-[var(--contentSub)] text-xs">{row.lunch.sides}</div>
-                      <div className="text-[var(--contentCaption)] text-xs mt-1">{row.lunch.kcal}kcal</div>
                     </td>
                     <td className="py-3 px-2">
                       <div className="font-bold text-[var(--contentMain)] flex items-center gap-2">{row.dinner.main} <span className="badge bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs px-2 py-0.5 rounded">{row.dinner.type}</span></div>
                       <div className="text-[var(--contentSub)] text-xs">{row.dinner.sides}</div>
-                      <div className="text-[var(--contentCaption)] text-xs mt-1">{row.dinner.kcal}kcal</div>
                     </td>
                     <td className="py-3 px-2 text-center">
                       <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
