@@ -25,12 +25,12 @@ const helpContents = [
     title: '시스템 개요',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '만나식권 관리자 시스템 소개',
         content: '만나식권 관리자 시스템은 식권 예약, QR 체크, 통계 등 다양한 기능을 통합적으로 관리할 수 있는 시스템입니다. 실시간 모니터링 데이터와 통계 뷰를 통해 효율적인 식권 운영 환경을 지원합니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--green500)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--green500)]" size="lg"/>,
         title: '주요 기능',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -43,7 +43,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '시스템 요구사항',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -55,7 +55,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faRightToBracket} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faRightToBracket} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '접속 및 로그인',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -72,12 +72,12 @@ const helpContents = [
     title: '대시보드 사용법',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '대시보드 개요',
         content: '대시보드는 사이트의 핵심 통계와 현황을 한눈에 확인할 수 있는 메인 화면입니다. 실시간 통계, 예약 현황, 알림 등 통합 운영 상황을 모니터링할 수 있습니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--green500)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--green500)]" size="lg"/>,
         title: '주요 통계 카드',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -88,7 +88,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '차트 해석 방법',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -99,7 +99,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faDownload} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faDownload} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '리포트 다운로드',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -109,7 +109,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faClock} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faClock} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '실시간 모니터링',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -124,12 +124,12 @@ const helpContents = [
     title: '사용자 관리',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '사용자 관리 개요',
         content: '사용자 관리에서는 시스템에 등록된 모든 사용자의 정보를 조회, 수정, 삭제할 수 있습니다. 사용자별 활동 현황 확인도 함께 관리할 수 있습니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '새 사용자 추가',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -140,7 +140,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faPenToSquare} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPenToSquare} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '사용자 정보 수정',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -150,7 +150,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--green500)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--green500)]" size="lg"/>,
         title: '사용자 상태 관리',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -160,7 +160,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '사용자 검색 및 필터링',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -170,7 +170,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'QR 제출률 분석',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -186,12 +186,12 @@ const helpContents = [
     title: '예약 관리',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '예약 관리 개요',
         content: '예약 관리에서는 전체 예약 현황을 실시간으로 확인하고, 일반 예약과 추가 예약을 구분하여 관리할 수 있습니다. 일반 예약과 추가 예약의 관련정보와 상태변경, QR 제출 현황 등도 함께 모니터링할 수 있습니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '일반 예약 관리',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -204,7 +204,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '추가 예약 관리',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -216,7 +216,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '예약 상태 이해',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -229,7 +229,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'QR 미제출자 관리',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -241,7 +241,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faDownload} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faDownload} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '예약 데이터 내보내기',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -259,12 +259,12 @@ const helpContents = [
     title: 'QR 관리',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'QR 관리 개요',
         content: 'QR 관리에서는 식사 예약자 확인을 위해 발급되는 QR 코드의 스캔 현황을 확인할 수 있습니다. QR 코드 스캔을 통해 현장확인과 식사 이중 방지를 확인하고, 미제출자를 관리할 수 있습니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'QR 스캐너 사용법',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -277,7 +277,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'QR 제출률 모니터링',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -288,7 +288,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '미제출자 알림 발송',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -300,7 +300,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '재발 조치 관리',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -311,7 +311,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'QR 스캔 기록 관리',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -327,12 +327,12 @@ const helpContents = [
     title: '메뉴 관리',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '메뉴 관리 개요',
         content: '메뉴 관리에서는 주간 식단표 등록, 메뉴 추가, 일괄 업로드, 알레르기 정보, 통계/분석 등 다양한 메뉴 관련 업무를 관리할 수 있습니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '새 메뉴 추가',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -344,7 +344,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '주간 메뉴 계획',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -357,7 +357,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faDownload} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faDownload} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '메뉴 일괄 업로드',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -371,7 +371,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '알레르기 정보 관리',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -383,7 +383,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '메뉴 통계 및 분석',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -400,12 +400,12 @@ const helpContents = [
     title: '공지사항 관리',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '공지사항 관리 개요',
         content: '공지사항 관리에서는 전체 공지, 긴급 공지, 고정 공지 등 다양한 유형의 공지사항을 등록, 수정, 삭제할 수 있습니다. 공지사항은 사용자에게 중요한 정보를 전달하는 데 활용됩니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '새 공지사항 등록',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -417,7 +417,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faPenToSquare} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPenToSquare} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '공지사항 수정 및 삭제',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -427,7 +427,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '공지사항 유형 및 상태',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -439,7 +439,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '공지사항 통계 및 관리',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -455,12 +455,12 @@ const helpContents = [
     title: '후원 관리',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '후원 관리 개요',
         content: '후원 관리에서는 후원 감사 게시글 작성, 카테고리별 관리, 투명성 확보, 게시글 상태 관리, 후원자 소통 등 후원 관련 업무를 통합적으로 관리할 수 있습니다.'
       },
       {
-        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faPlus} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '감사 게시글 작성',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -472,7 +472,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '카테고리별 관리',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -486,7 +486,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '투명성 확보',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -498,7 +498,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '게시글 상태 관리',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -511,7 +511,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '후원자 소통',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -528,12 +528,12 @@ const helpContents = [
     title: '시스템 설정',
     sections: [
       {
-        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleInfo} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '시스템 설정 개요',
         content: '시스템 설정에서는 메일/푸시, API, 보안, 백업, 모니터링 등 시스템 운영에 필요한 전반의 관리를 할 수 있습니다. 알림 발송, API키, 보안정책, 백업 등 자동화/정책 관리.'
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '기본 설정 관리',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -545,7 +545,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: 'API 연동 설정',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -558,7 +558,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '보안 설정',
         content: (
           <ol className="list-decimal ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -571,7 +571,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faCircleCheck} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '백업 및 복원',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -583,7 +583,7 @@ const helpContents = [
         )
       },
       {
-        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="2x"/>,
+        icon: <FontAwesomeIcon icon={faLaptop} className="text-[var(--primaryBlue)]" size="lg"/>,
         title: '시스템 모니터링',
         content: (
           <ul className="list-disc ml-6 mt-1 text-[var(--contentMain)] text-sm">
@@ -599,9 +599,9 @@ const helpContents = [
 ];
 
 const quickMenus = [
-  { icon: <FontAwesomeIcon icon={faFileLines} className="text-[var(--primaryBlue)]" size="2x"/>, label: '사용자 매뉴얼', desc: '상세한 사용자 매뉴얼을 PDF로 다운로드하세요.', btn: '다운로드' },
-  { icon: <FontAwesomeIcon icon={faHeadset} className="text-[var(--green500)]" size="2x"/>, label: '실시간 지원', desc: '궁금한 점이 있으신가요? 언제든 문의하세요.', btn: '문의하기' },
-  { icon: <FontAwesomeIcon icon={faVideo} className="text-[var(--purple500)]" size="2x"/>, label: '동영상 튜토리얼', desc: '단계별 사용법을 동영상으로 확인하세요.', btn: '시청하기' },
+  { icon: <FontAwesomeIcon icon={faFileLines} className="text-[var(--primaryBlue)]" size="lg"/>, label: '사용자 매뉴얼', desc: '상세한 사용자 매뉴얼을 PDF로 다운로드하세요.', btn: '다운로드' },
+  { icon: <FontAwesomeIcon icon={faHeadset} className="text-[var(--green500)]" size="lg"/>, label: '실시간 지원', desc: '궁금한 점이 있으신가요? 언제든 문의하세요.', btn: '문의하기' },
+  { icon: <FontAwesomeIcon icon={faVideo} className="text-[var(--purple500)]" size="lg"/>, label: '동영상 튜토리얼', desc: '단계별 사용법을 동영상으로 확인하세요.', btn: '시청하기' },
 ];
 
 const updates = [
