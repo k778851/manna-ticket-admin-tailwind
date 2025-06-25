@@ -105,21 +105,21 @@ export default function Users() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
+                <th className="font-bold text-[var(--contentMain)] py-2">부서</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">이름</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">고유번호</th>
-                <th className="font-bold text-[var(--contentMain)] py-2">부서</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">점심 예약</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">저녁 예약</th>
                 <th className="font-bold text-[var(--contentMain)] py-2">QR 제출률</th>
-                <th className="font-bold text-[var(--contentMain)] py-2">작업</th>
+                <th className="font-bold text-[var(--contentMain)] py-2">편집</th>
               </tr>
             </thead>
             <tbody className="text-center">
               {filteredUsers.map(row => (
                 <tr key={row.id} className="border-b last:border-b-0">
+                  <td className="py-2 text-center">{row.department}</td>
                   <td className="py-2 text-center">{row.name}</td>
                   <td className="py-2 text-center">{row.personalNumber}</td>
-                  <td className="py-2 text-center">{row.department}</td>
                   <td className="py-2">{row.lunchCount}회</td>
                   <td className="py-2">{row.dinnerCount}회</td>
                   <td className="py-2 text-center">

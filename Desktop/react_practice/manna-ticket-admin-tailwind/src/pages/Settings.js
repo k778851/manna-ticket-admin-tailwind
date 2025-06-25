@@ -109,7 +109,21 @@ const Settings = () => {
       )}
       {tab === 1 && (
         <div className="flex flex-col gap-6">
-          {/* API 연동 상태 박스 */}
+          {/* API 연동 상태 샘플 */}
+          <div className="font-bold text-[var(--contentMain)] mb-2 mt-2">API 연동 상태 샘플</div>
+          {/* 성공 상태 */}
+          <div className="bg-[#e6fffb] border border-[#87e8de] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
+            <FontAwesomeIcon icon={faCheckCircle} className="w-4 h-4 text-green-500" />
+            <span className="font-semibold text-[var(--contentMain)]">API 연동 성공</span>
+            <span className="text-sm text-green-500 ml-4">API 서버와 정상적으로 연결되었습니다.</span>
+          </div>
+          {/* 진행중 상태 */}
+          <div className="bg-[#f0f5ff] border border-[#adc6ff] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
+            <FontAwesomeIcon icon={faRefresh} spin className="w-4 h-4 text-blue-500" />
+            <span className="font-semibold text-[var(--contentMain)]">API 연동 시도중...</span>
+            <span className="text-sm text-blue-500 ml-4">API 서버에 연결을 시도하고 있습니다.</span>
+          </div>
+          {/* 실패 상태 (기존) */}
           <div className="bg-[#fff7e6] border border-[#ffe58f] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
             <div className="flex items-center gap-2">
               <FontAwesomeIcon icon={faExclamationTriangle} className="w-4 h-4 text-red-500" />

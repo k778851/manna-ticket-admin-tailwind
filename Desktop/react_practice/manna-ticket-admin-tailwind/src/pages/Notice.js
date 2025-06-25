@@ -91,7 +91,7 @@ export default function Notice() {
               <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">상태</th>
               <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">조회수</th>
               <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">작성일</th>
-              <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">작업</th>
+              <th className="py-3 px-2 font-bold text-[var(--contentMain)] text-center">편집</th>
             </tr>
           </thead>
           <tbody>

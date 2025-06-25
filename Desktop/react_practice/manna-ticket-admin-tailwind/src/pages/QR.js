@@ -13,8 +13,8 @@ const qrStats = {
 };
 
 const notSubmitted = [
-  { id: 1, user: '이영희', meal: '저녁', time: '18:00', count: 3, status: '경고' },
-  { id: 2, user: '박민수', meal: '점심', time: '12:00', count: 1, status: '정상' },
+  { id: 1, department: '영업팀', user: '이영희', meal: '저녁', time: '18:00', lunchCount: 0, dinnerCount: 3, status: '경고' },
+  { id: 2, department: '총무팀', user: '박민수', meal: '점심', time: '12:00', lunchCount: 1, dinnerCount: 0, status: '정상' },
 ];
 
 export default function QR() {
@@ -54,35 +54,24 @@ export default function QR() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">사용자</th>
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">예약 식사</th>
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">예약 시간</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">부서</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">이름</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">점심예약</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">저녁예약</th>
                 <th className="font-bold text-[var(--contentMain)] py-2 text-center">미제출 횟수</th>
                 <th className="font-bold text-[var(--contentMain)] py-2 text-center">상태</th>
-                <th className="font-bold text-[var(--contentMain)] py-2 text-left">작업</th>
               </tr>
             </thead>
             <tbody>
               {notSubmitted.map(row => (
                 <tr key={row.id} className="border-b last:border-b-0">
+                  <td className="py-2 text-center">{row.department}</td>
                   <td className="py-2 text-center">{row.user}</td>
-                  <td className="py-2 text-center">{row.meal}</td>
-                  <td className="py-2 text-center">{row.time}</td>
-                  <td className="py-2 text-center">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${row.count >= 3 ? 'bg-[var(--red50)] text-[var(--red500)]' : 'bg-[var(--bgTertiary)] text-[var(--contentMain)]'}`}>{row.count}회</span>
-                  </td>
+                  <td className="py-2 text-center">{row.lunchCount > 0 ? row.lunchCount : '-'}</td>
+                  <td className="py-2 text-center">{row.dinnerCount > 0 ? row.dinnerCount : '-'}</td>
+                  <td className="py-2 text-center">{row.lunchCount + row.dinnerCount}회</td>
                   <td className="py-2 text-center">
                     <span className={`px-2 py-1 rounded text-xs font-bold ${row.status === '경고' ? 'bg-[var(--red50)] text-[var(--red500)]' : 'bg-[var(--green50)] text-[var(--green500)]'}`}>{row.status}</span>
-                  </td>
-                  <td className="py-2 text-left">
-                    <div className="flex flex-row gap-2 items-center">
-                      <button className="px-3 py-1 rounded border border-[var(--primaryBlue)] text-[var(--primaryBlue)] text-xs font-semibold inline-flex items-center gap-1 hover:bg-[var(--blue50)] transition min-w-[80px] justify-center">
-                        <FontAwesomeIcon icon={faBell} className="w-4 h-4" /> 알림 발송</button>
-                      {row.status === '경고' && (
-                        <button className="px-3 py-1 rounded border border-[var(--red500)] text-[var(--red500)] text-xs font-semibold inline-flex items-center gap-1 hover:bg-[var(--red50)] transition min-w-[60px] justify-center">
-                          <FontAwesomeIcon icon={faBan} className="w-4 h-4" /> 재제</button>
-                      )}
-                    </div>
                   </td>
                 </tr>
               ))}

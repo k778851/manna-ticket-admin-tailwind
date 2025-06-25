@@ -11,14 +11,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 const regularReservations = [
-  { id: 1, user: '김철수', date: '2024-01-15', meal: '점심', status: '확정', qr: true, time: '12:30' },
-  { id: 2, user: '박민수', date: '2024-01-15', meal: '점심', status: '확정', qr: false, time: '-' },
+  { id: 1, user: '김철수', department: '총무팀', date: '2024-01-15', meal: '점심', status: '확정', qr: true, time: '12:30' },
+  { id: 2, user: '박민수', department: '기획팀', date: '2024-01-15', meal: '점심', status: '확정', qr: false, time: '-' },
 ];
 
 const additionalReservations = [
-  { id: 1, user: '이영희', date: '2024-01-15', meal: '저녁', count: 2, reason: '회사 회식으로 인한 추가 인원 필요', status: '대기', qr: false },
-  { id: 2, user: '정수진', date: '2024-01-15', meal: '저녁', count: 1, reason: '갑작스런 업무로 인한 추가 식사 필요', status: '대기', qr: false },
-  { id: 3, user: '최영호', date: '2024-01-15', meal: '점심', count: 3, reason: '외부 방문객 접대', status: '확정', qr: true },
+  { id: 1, user: '이영희', department: '영업팀', date: '2024-01-15', meal: '저녁', count: 2, reason: '회사 회식으로 인한 추가 인원 필요', status: '대기', qr: false },
+  { id: 2, user: '정수진', department: '개발팀', date: '2024-01-15', meal: '저녁', count: 1, reason: '갑작스런 업무로 인한 추가 식사 필요', status: '대기', qr: false },
+  { id: 3, user: '최영호', department: '마케팅팀', date: '2024-01-15', meal: '점심', count: 3, reason: '외부 방문객 접대', status: '확정', qr: true },
 ];
 
 // 일반 예약 점심/저녁 개수 계산
@@ -45,13 +45,11 @@ export default function Reservations() {
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState('');
   const [mealFilter, setMealFilter] = useState('전체');
-  const [statusFilter, setStatusFilter] = useState('전체');
   const navigate = useNavigate();
 
   const filtered = (tab === 0 ? regularReservations : additionalReservations).filter(r =>
     (!search || r.user.includes(search)) &&
-    (mealFilter === '전체' || r.meal === mealFilter) &&
-    (statusFilter === '전체' || r.status === statusFilter)
+    (mealFilter === '전체' || r.meal === mealFilter)
   );
 
   return (
@@ -108,43 +106,44 @@ export default function Reservations() {
             <option value="점심">점심</option>
             <option value="저녁">저녁</option>
           </select>
-          <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--white)] text-sm" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{width:100}}>
-            <option value="전체">전체</option>
-            <option value="확정">확정</option>
-            <option value="대기">대기</option>
-          </select>
         </div>
         {/* 테이블 */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">사용자</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">부서</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">이름</th>
                 <th className="font-bold text-[var(--contentMain)] py-2 text-center">날짜</th>
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">식사</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">점심</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">저녁</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">QR제출(점심)</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">QR제출(저녁)</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">제출시간(점심)</th>
+                <th className="font-bold text-[var(--contentMain)] py-2 text-center">제출시간(저녁)</th>
                 {tab === 1 && <th className="font-bold text-[var(--contentMain)] py-2 text-center">추가 인원</th>}
                 {tab === 1 && <th className="font-bold text-[var(--contentMain)] py-2 text-center">신청 사유</th>}
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">상태</th>
-                <th className="font-bold text-[var(--contentMain)] py-2 text-center">QR 제출</th>
-                {tab === 0 && <th className="font-bold text-[var(--contentMain)] py-2 text-center">제출 시간</th>}
                 {tab === 1 && <th className="font-bold text-[var(--contentMain)] py-2 text-center">작업</th>}
               </tr>
             </thead>
             <tbody>
               {filtered.map(r => (
                 <tr key={r.id} className="border-b last:border-b-0">
+                  <td className="py-2 text-center">{r.department}</td>
                   <td className="py-2 font-bold text-[var(--contentMain)] text-center">{r.user}</td>
                   <td className="py-2 text-center">{r.date}</td>
-                  <td className="py-2 text-center">{r.meal}</td>
+                  <td className="py-2 text-center">{r.meal === '점심' ? <span className="text-[var(--green500)] font-bold">O</span> : <span className="text-[var(--contentCaption)]">X</span>}</td>
+                  <td className="py-2 text-center">{r.meal === '저녁' ? <span className="text-[var(--green500)] font-bold">O</span> : <span className="text-[var(--contentCaption)]">X</span>}</td>
+                  {/* QR제출(점심) */}
+                  <td className="py-2 text-center">{r.meal === '점심' ? (r.qr ? <FontAwesomeIcon icon={faCheck} className="inline text-[var(--primaryBlue)]" /> : <FontAwesomeIcon icon={faXmark} className="inline text-[var(--red500)]" />) : '-'}</td>
+                  {/* QR제출(저녁) */}
+                  <td className="py-2 text-center">{r.meal === '저녁' ? (r.qr ? <FontAwesomeIcon icon={faCheck} className="inline text-[var(--primaryBlue)]" /> : <FontAwesomeIcon icon={faXmark} className="inline text-[var(--red500)]" />) : '-'}</td>
+                  {/* 제출시간(점심) */}
+                  <td className="py-2 text-center">{r.meal === '점심' ? (r.time && r.time !== '-' ? r.time : '-') : '-'}</td>
+                  {/* 제출시간(저녁) */}
+                  <td className="py-2 text-center">{r.meal === '저녁' ? (r.time && r.time !== '-' ? r.time : '-') : '-'}</td>
                   {tab === 1 && <td className="py-2 text-center text-[var(--yellow700)] font-bold">+{r.count}명</td>}
                   {tab === 1 && <td className="py-2 text-center">{r.reason}</td>}
-                  <td className="py-2 text-center">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${r.status === '확정' ? 'bg-[var(--green100)] text-[var(--green500)]' : 'bg-[var(--bgTertiary)] text-[var(--contentCaption)]'}`}>{r.status}</span>
-                  </td>
-                  <td className="py-2 text-center">
-                    {r.qr ? <FontAwesomeIcon icon={faCheck} className="inline text-[var(--primaryBlue)]" /> : <FontAwesomeIcon icon={faXmark} className="inline text-[var(--red500)]" />}
-                  </td>
-                  {tab === 0 && <td className="py-2 text-center">{r.time}</td>}
                   {tab === 1 && (
                     <td className="py-2 text-center">
                       <div className="flex justify-center gap-2">
