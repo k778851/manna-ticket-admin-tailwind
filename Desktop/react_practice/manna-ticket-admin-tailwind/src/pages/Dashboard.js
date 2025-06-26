@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Switch from "react-switch";
 import QRNotSubmittedTable from '../components/QRNotSubmittedTable';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import * as XLSX from 'xlsx';
 Chart.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ChartDataLabels);
 
 // CSS 변수값을 실제 색상값으로 변환하는 헬퍼
@@ -15,8 +16,9 @@ function getVarColor(name) {
 }
 
 const notSubmitted = [
-  { id: 1, user: '이영희', meal: '저녁', time: '18:00', count: 3, status: '경고' },
-  { id: 2, user: '박민수', meal: '점심', time: '12:00', count: 1, status: '정상' },
+  { id: 1, department: '개발팀', name: '김철수', user: 'kimcs', meal: '저녁', time: '18:00', count: 3 },
+  { id: 2, department: '디자인팀', name: '이영희', user: 'leeyh', meal: '점심', time: '12:00', count: 1 },
+  { id: 3, department: '기획팀', name: '박민수', user: 'parkms', meal: '저녁', time: '18:00', count: 2 },
 ];
 
 export default function Dashboard() {
@@ -114,6 +116,46 @@ export default function Dashboard() {
 
   // 즉시 새로고침
   const handleManualRefresh = () => setRefreshKey((prev) => prev + 1);
+
+  // QR 미제출자 데이터 내보내기
+  const handleExportQRData = (format = 'csv') => {
+    const headers = ['부서', '이름', '예약시간', '미제출 횟수'];
+    const data = notSubmitted.map(row => [
+      row.department,
+      row.name,
+      `${row.meal} ${row.time}`,
+      `${row.count}회`
+    ]);
+
+    if (format === 'xlsx') {
+      // XLSX 형식으로 내보내기
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'QR_미제출자');
+      
+      // 컬럼 너비 자동 조정
+      const colWidths = headers.map(header => ({ wch: Math.max(header.length, 10) }));
+      ws['!cols'] = colWidths;
+      
+      XLSX.writeFile(wb, `QR_미제출자_${new Date().toISOString().split('T')[0]}.xlsx`);
+    } else {
+      // CSV 형식으로 내보내기
+      const csvContent = [
+        headers.join(','),
+        ...data.map(row => row.join(','))
+      ].join('\n');
+
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `QR_미제출자_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
 
   // 차트 색상 변수값을 useMemo로 캐싱
   const chartColors = useMemo(() => ({
@@ -373,8 +415,32 @@ export default function Dashboard() {
           <div className="bg-white rounded-lg shadow-lg p-4 w-full max-w-lg mx-2 relative">
             <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xl" onClick={() => setQrModalOpen(false)}>&times;</button>
             <div className="font-bold text-[var(--contentMain)] mb-2 text-lg">QR 미제출자 명단</div>
-            <div className="text-xs text-[var(--contentCaption)] mb-3">식사 예약 후 QR 코드를 제출하지 않은 사용자 목록</div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-xs text-[var(--contentCaption)]">식사 예약 후 QR 코드를 제출하지 않은 사용자 목록</div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleExportQRData('xlsx')}
+                  className="px-3 py-1.5 rounded-lg bg-[var(--primaryBlue)] text-white text-xs font-medium hover:bg-blue-600 transition-colors duration-200"
+                >
+                  XLSX
+                </button>
+                <button
+                  onClick={() => handleExportQRData('csv')}
+                  className="px-3 py-1.5 rounded-lg bg-[var(--green500)] text-white text-xs font-medium hover:bg-green-600 transition-colors duration-200"
+                >
+                  CSV
+                </button>
+              </div>
+            </div>
             <QRNotSubmittedTable notSubmitted={notSubmitted} />
+            <div className="flex justify-end mt-4 pt-3 border-t border-[var(--borderOutline)]">
+              <button
+                onClick={() => setQrModalOpen(false)}
+                className="px-4 py-2 rounded-lg bg-white border border-[var(--borderOutline)] text-[var(--contentMain)] text-sm font-medium hover:bg-[var(--bgSecondary)] transition-colors duration-200"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}
