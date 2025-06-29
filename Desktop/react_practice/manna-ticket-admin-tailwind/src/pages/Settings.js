@@ -34,10 +34,13 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-4 bg-[var(--bgSecondary)] min-h-screen">
-      <h1 className="text-2xl font-bold text-[var(--contentMain)] mb-4 flex items-center gap-2">
-        시스템 설정
-      </h1>
+    <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
+      {/* 상단 타이틀 */}
+      <div className="flex items-center justify-between px-10 pt-10 pb-4">
+        <h1 className="text-3xl font-bold text-[var(--contentMain)] flex items-center gap-2">
+          시스템 설정
+        </h1>
+      </div>
       <div className="flex justify-center gap-2 mb-6 px-10">
         <button
           onClick={() => setTab(0)}
@@ -65,7 +68,7 @@ const Settings = () => {
         </button>
       </div>
       {tab === 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-[var(--borderOutline)]">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-[var(--borderOutline)] mx-10 mb-10">
           <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
             <FontAwesomeIcon icon={faCog} className="w-5 h-5 text-[var(--primaryBlue)]" />
             기본 설정
@@ -108,7 +111,7 @@ const Settings = () => {
         </div>
       )}
       {tab === 1 && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 px-10 mb-10">
           {/* API 연동 상태 샘플 */}
           <div className="font-bold text-[var(--contentMain)] mb-2 mt-2">API 연동 상태 샘플</div>
           {/* 성공 상태 */}
@@ -233,7 +236,7 @@ const Settings = () => {
         </div>
       )}
       {tab === 2 && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-[var(--borderOutline)]">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-[var(--borderOutline)] mx-10 mb-10">
           <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
             <FontAwesomeIcon icon={faShieldHalved} className="w-5 h-5 text-[var(--primaryBlue)]" />
             보안 설정

@@ -6,20 +6,30 @@ import {
   faPenToSquare, 
   faEye, 
   faTrash, 
-  faMagnifyingGlass 
+  faMagnifyingGlass,
+  faUpload,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons';
+import * as XLSX from 'xlsx';
 
 
 const initialUsers = [
-  { id: 1, name: '김철수', personalNumber: '00371210-00149', department: '총무팀', lunchCount: 12, dinnerCount: 11, qr: 95 },
-  { id: 2, name: '이영희', personalNumber: '00371210-00150', department: '기획팀', lunchCount: 8, dinnerCount: 7, qr: 87 },
-  { id: 3, name: '박민수', personalNumber: '00371210-00151', department: '영업팀', lunchCount: 16, dinnerCount: 15, qr: 100 },
+  { id: 1, name: '김철수', personalNumber: '00371210-00149', department: '총무부', lunchCount: 12, dinnerCount: 11, qr: 95 },
+  { id: 2, name: '이영희', personalNumber: '00371210-00150', department: '기획부', lunchCount: 8, dinnerCount: 7, qr: 87 },
+  { id: 3, name: '박민수', personalNumber: '00371210-00151', department: '교육부', lunchCount: 16, dinnerCount: 15, qr: 100 },
+];
+
+// 부서명 리스트 추가
+const departmentList = [
+  '총무부', '행정서무부', '내무부', '기획부', '재정부', '교육부', '신학부', '해외선교부', '전도부', '문화부', '출판부', '정보통신부', '찬양부', '섭외부', '국내선교부', '홍보부', '법무부', '감사부', '건설부', '체육부', '사업부', '보건후생복지부', '봉사교통부', '외교정책부',
+  '자문회', '장년회', '부녀회', '청년회', '학생회', '유년회'
 ];
 
 export default function Users() {
   const [search, setSearch] = useState('');
   const [users, setUsers] = useState(initialUsers);
   const [modalOpen, setModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', personalNumber: '', department: '' });
 
   const filteredUsers = users.filter(
@@ -46,13 +56,127 @@ export default function Users() {
     setModalOpen(false);
   };
 
+  // 템플릿 다운로드 함수
+  const downloadTemplate = () => {
+    const template = [
+      {
+        '이름': '김철수',
+        '부서': '총무부',
+        '고유번호': '00371210-00149'
+      },
+      {
+        '이름': '이영희',
+        '부서': '기획부',
+        '고유번호': '00371210-00150'
+      },
+      {
+        '이름': '박민수',
+        '부서': '교육부',
+        '고유번호': '00371210-00151'
+      }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(template);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "사용자템플릿");
+    
+    // 컬럼 너비 설정
+    ws['!cols'] = [
+      { width: 15 }, // 이름
+      { width: 20 }, // 부서
+      { width: 20 }  // 고유번호
+    ];
+
+    XLSX.writeFile(wb, "사용자_업로드_템플릿.xlsx");
+  };
+
+  // 파일 업로드 처리 함수
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        // 데이터 검증 및 변환
+        const validUsers = jsonData.filter(row => 
+          row['이름'] && row['부서'] && row['고유번호']
+        ).map((row, index) => ({
+          id: users.length + index + 1,
+          name: row['이름'],
+          department: row['부서'],
+          personalNumber: row['고유번호'],
+          lunchCount: 0,
+          dinnerCount: 0,
+          qr: 0,
+        }));
+
+        if (validUsers.length > 0) {
+          setUsers([...users, ...validUsers]);
+          alert(`${validUsers.length}명의 사용자가 성공적으로 업로드되었습니다.`);
+        } else {
+          alert('유효한 사용자 데이터가 없습니다. 템플릿 형식을 확인해주세요.');
+        }
+      } catch (error) {
+        alert('파일 처리 중 오류가 발생했습니다. 템플릿 형식을 확인해주세요.');
+        console.error('File upload error:', error);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // 사용자 목록 내보내기 함수
+  const exportUsers = () => {
+    const exportData = users.map(user => ({
+      '이름': user.name,
+      '부서': user.department,
+      '고유번호': user.personalNumber,
+      '점심 예약수': user.lunchCount,
+      '저녁 예약수': user.dinnerCount,
+      'QR 제출률': `${user.qr}%`
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "사용자목록");
+    
+    // 컬럼 너비 설정
+    ws['!cols'] = [
+      { width: 15 }, // 이름
+      { width: 20 }, // 부서
+      { width: 20 }, // 고유번호
+      { width: 12 }, // 점심 예약수
+      { width: 12 }, // 저녁 예약수
+      { width: 12 }  // QR 제출률
+    ];
+
+    XLSX.writeFile(wb, `사용자목록_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
       {/* 상단 타이틀 + 버튼 */}
       <div className="flex items-center justify-between px-10 pt-10 pb-4">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">사용자 관리</h1>
         <div className="flex gap-2">
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 사용자 목록 내보내기</button>
+          <button 
+            className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"
+            onClick={() => setUploadModalOpen(true)}
+          >
+            <FontAwesomeIcon icon={faUpload} className="w-5 h-5" /> 사용자 일괄 업로드
+          </button>
+          <button 
+            className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"
+            onClick={exportUsers}
+          >
+            <FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 사용자 목록 내보내기
+          </button>
           <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => setModalOpen(true)}><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 사용자 추가</button>
         </div>
       </div>
@@ -76,14 +200,18 @@ export default function Users() {
               onChange={e => setForm({ ...form, personalNumber: e.target.value })}
               required
             />
-            <input
+            {/* 부서 셀렉트 박스 */}
+            <select
               className="border border-[var(--borderInput)] rounded px-3 py-2 text-sm"
-              placeholder="부서"
-              type="text"
               value={form.department}
               onChange={e => setForm({ ...form, department: e.target.value })}
               required
-            />
+            >
+              <option value="" disabled>부서 선택</option>
+              {departmentList.map(dep => (
+                <option key={dep} value={dep}>{dep}</option>
+              ))}
+            </select>
             <div className="flex gap-2 mt-2">
               <button type="button" className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" onClick={() => setModalOpen(false)}>취소</button>
               <button type="submit" className="flex-1 py-2 rounded bg-blue-500 text-white font-semibold">저장</button>
@@ -140,6 +268,55 @@ export default function Users() {
           </table>
         </div>
       </div>
+      
+      {/* 사용자 일괄 업로드 모달 */}
+      {uploadModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[var(--contentMain)]">사용자 일괄 업로드</h3>
+              <button className="text-gray-400 hover:text-gray-700" onClick={() => setUploadModalOpen(false)}>
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-[var(--contentMain)] mb-2">1. 템플릿 다운로드</h4>
+                <button 
+                  onClick={downloadTemplate}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                >
+                  <FontAwesomeIcon icon={faDownload} />
+                  엑셀 템플릿 다운로드
+                </button>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-[var(--contentMain)] mb-2">2. 파일 업로드</h4>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleFileUpload}
+                  className="w-full p-2 border border-[var(--borderInput)] rounded"
+                />
+                <p className="text-xs text-[var(--contentCaption)] mt-1">
+                  엑셀 파일(.xlsx, .xls)만 업로드 가능합니다.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 mt-4">
+              <button 
+                className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" 
+                onClick={() => setUploadModalOpen(false)}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

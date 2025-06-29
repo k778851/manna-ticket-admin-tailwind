@@ -13,8 +13,8 @@ const qrStats = {
 };
 
 const notSubmitted = [
-  { id: 1, department: '영업팀', user: '이영희', meal: '저녁', time: '18:00', lunchCount: 0, dinnerCount: 3, status: '경고' },
-  { id: 2, department: '총무팀', user: '박민수', meal: '점심', time: '12:00', lunchCount: 1, dinnerCount: 0, status: '정상' },
+  { id: 1, department: '문화부', user: '이영희', meal: '저녁', time: '18:00', lunchCount: 0, dinnerCount: 3, status: '경고' },
+  { id: 2, department: '홍보부', user: '박민수', meal: '점심', time: '12:00', lunchCount: 1, dinnerCount: 0, status: '정상' },
 ];
 
 export default function QR() {

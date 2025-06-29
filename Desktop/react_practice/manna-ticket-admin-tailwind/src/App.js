@@ -41,7 +41,7 @@ function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bgSecondary)]">
+    <div className="min-h-screen bg-[var(--bgSecondary)] flex flex-col">
       {/* 로그인 페이지가 아니면 사이드바 노출 */}
       {!isLogin && (
         <Sidebar 
@@ -50,7 +50,7 @@ function MainLayout() {
         />
       )}
       <main
-        className="transition-all duration-300"
+        className="transition-all duration-300 flex-1"
         style={{ marginLeft: isLogin ? 0 : isSidebarCollapsed ? 80 : 240 }}
       >
         <Routes>
@@ -68,6 +68,15 @@ function MainLayout() {
           <Route path="/icons" element={<Icons />} />
         </Routes>
       </main>
+      {/* 푸터 */}
+      {!isLogin && (
+        <footer 
+          className="bg-white border-t border-[var(--borderOutline)] py-4 text-center text-sm text-[var(--contentCaption)]"
+          style={{ marginLeft: isSidebarCollapsed ? 80 : 240 }}
+        >
+          © 2025 만나식권. All rights reserved.
+        </footer>
+      )}
     </div>
   );
 }

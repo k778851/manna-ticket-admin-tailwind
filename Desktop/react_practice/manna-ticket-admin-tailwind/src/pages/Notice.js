@@ -8,7 +8,8 @@ import {
   faCircleExclamation,
   faThumbtack,
   faEyeSlash,
-  faMagnifyingGlass
+  faMagnifyingGlass,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons';
 
 const noticeStats = [
@@ -43,18 +44,53 @@ const notices = [
 export default function Notice() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('전체');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [noticesState, setNotices] = useState(notices);
+  const [form, setForm] = useState({
+    title: '',
+    content: '',
+    priority: '보통',
+    isFixed: false,
+    isNew: true
+  });
 
-  const filtered = notices.filter(n =>
+  const filtered = noticesState.filter(n =>
     (!search || n.title.includes(search)) &&
     (filter === '전체' || (filter === '긴급' && n.priority === '높음') || (filter === '고정' && n.isFixed))
   );
+
+  const handleAddNotice = (e) => {
+    e.preventDefault();
+    if (!form.title || !form.content) return;
+    
+    const newNotice = {
+      id: noticesState.length + 1,
+      title: form.title,
+      content: form.content,
+      isNew: form.isNew,
+      isFixed: form.isFixed,
+      priority: form.priority,
+      status: '게시중',
+      views: 0,
+      date: new Date().toISOString().split('T')[0],
+    };
+    
+    setNotices([newNotice, ...noticesState]);
+    setForm({ title: '', content: '', priority: '보통', isFixed: false, isNew: true });
+    setModalOpen(false);
+  };
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
       {/* 상단 타이틀 + 추가 버튼 (버튼 오른쪽 끝 고정) */}
       <div className="flex items-center justify-between px-10 pt-10 pb-2 mb-6">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">공지사항 관리</h1>
-        <button className="button-primary-m flex items-center gap-1 px-5 py-3 whitespace-nowrap"><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 공지사항 추가</button>
+        <button 
+          className="button-primary-m flex items-center gap-1 px-5 py-3 whitespace-nowrap"
+          onClick={() => setModalOpen(true)}
+        >
+          <FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 공지사항 추가
+        </button>
       </div>
       {/* 통계 카드 전체 너비, 한 줄 4개 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-10 mb-8 w-full">
@@ -120,6 +156,109 @@ export default function Notice() {
           </tbody>
         </table>
       </div>
+      
+      {/* 공지사항 추가 모달 */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[var(--contentMain)]">공지사항 추가</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700"
+                onClick={() => setModalOpen(false)}
+              >
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddNotice} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  제목 *
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                  placeholder="공지사항 제목을 입력하세요"
+                  value={form.title}
+                  onChange={(e) => setForm({...form, title: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  내용 *
+                </label>
+                <textarea
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] resize-none"
+                  rows="6"
+                  placeholder="공지사항 내용을 입력하세요"
+                  value={form.content}
+                  onChange={(e) => setForm({...form, content: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    중요도
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                    value={form.priority}
+                    onChange={(e) => setForm({...form, priority: e.target.value})}
+                  >
+                    <option value="보통">보통</option>
+                    <option value="높음">높음</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2 mt-6">
+                  <input
+                    type="checkbox"
+                    id="isFixed"
+                    checked={form.isFixed}
+                    onChange={(e) => setForm({...form, isFixed: e.target.checked})}
+                  />
+                  <label htmlFor="isFixed" className="text-sm text-[var(--contentMain)]">
+                    고정 공지로 설정
+                  </label>
+                </div>
+                
+                <div className="flex items-center gap-2 mt-6">
+                  <input
+                    type="checkbox"
+                    id="isNew"
+                    checked={form.isNew}
+                    onChange={(e) => setForm({...form, isNew: e.target.checked})}
+                  />
+                  <label htmlFor="isNew" className="text-sm text-[var(--contentMain)]">
+                    NEW 표시
+                  </label>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold"
+                  onClick={() => setModalOpen(false)}
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded bg-[var(--primaryBlue)] text-white font-semibold hover:bg-[var(--blue700)]"
+                >
+                  등록
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

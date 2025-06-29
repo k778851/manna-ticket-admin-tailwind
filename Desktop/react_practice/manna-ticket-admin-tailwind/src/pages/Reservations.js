@@ -9,16 +9,17 @@ import {
   faEye
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 const regularReservations = [
-  { id: 1, user: '김철수', department: '총무팀', date: '2024-01-15', meal: '점심', status: '확정', qr: true, time: '12:30' },
-  { id: 2, user: '박민수', department: '기획팀', date: '2024-01-15', meal: '점심', status: '확정', qr: false, time: '-' },
+  { id: 1, user: '김철수', department: '총무부', date: '2024-01-15', meal: '점심', status: '확정', qr: true, time: '12:30' },
+  { id: 2, user: '박민수', department: '기획부', date: '2024-01-15', meal: '점심', status: '확정', qr: false, time: '-' },
 ];
 
 const additionalReservations = [
-  { id: 1, user: '이영희', department: '영업팀', date: '2024-01-15', meal: '저녁', count: 2, reason: '회사 회식으로 인한 추가 인원 필요', status: '대기', qr: false },
-  { id: 2, user: '정수진', department: '개발팀', date: '2024-01-15', meal: '저녁', count: 1, reason: '갑작스런 업무로 인한 추가 식사 필요', status: '대기', qr: false },
-  { id: 3, user: '최영호', department: '마케팅팀', date: '2024-01-15', meal: '점심', count: 3, reason: '외부 방문객 접대', status: '확정', qr: true },
+  { id: 1, user: '이영희', department: '교육부', date: '2024-01-15', meal: '저녁', count: 2, reason: '회사 회식으로 인한 추가 인원 필요', status: '대기', qr: false },
+  { id: 2, user: '정수진', department: '문화부', date: '2024-01-15', meal: '저녁', count: 1, reason: '갑작스런 업무로 인한 추가 식사 필요', status: '대기', qr: false },
+  { id: 3, user: '최영호', department: '홍보부', date: '2024-01-15', meal: '점심', count: 3, reason: '외부 방문객 접대', status: '확정', qr: true },
 ];
 
 // 일반 예약 점심/저녁 개수 계산
@@ -52,6 +53,61 @@ export default function Reservations() {
     (mealFilter === '전체' || r.meal === mealFilter)
   );
 
+  // 엑셀 다운로드 함수
+  const exportToExcel = () => {
+    // 현재 탭에 따른 데이터 준비
+    const currentData = tab === 0 ? regularReservations : additionalReservations;
+    
+    // 엑셀용 데이터 변환
+    const excelData = currentData.map(item => {
+      if (tab === 0) {
+        // 일반 예약 데이터
+        return {
+          '부서': item.department,
+          '이름': item.user,
+          '날짜': item.date,
+          '식사': item.meal,
+          '상태': item.status,
+          'QR제출': item.qr ? '제출' : '미제출',
+          '제출시간': item.time || '-'
+        };
+      } else {
+        // 추가 예약 데이터
+        return {
+          '부서': item.department,
+          '이름': item.user,
+          '날짜': item.date,
+          '식사': item.meal,
+          '추가인원': `${item.count}명`,
+          '신청사유': item.reason,
+          '상태': item.status,
+          'QR제출': item.qr ? '제출' : '미제출'
+        };
+      }
+    });
+
+    // 워크북 생성
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(excelData);
+
+    // 열 너비 자동 조정
+    const colWidths = Object.keys(excelData[0] || {}).map(key => ({
+      wch: Math.max(key.length, ...excelData.map(row => String(row[key]).length)) + 2
+    }));
+    ws['!cols'] = colWidths;
+
+    // 워크시트를 워크북에 추가
+    const sheetName = tab === 0 ? '일반예약현황' : '추가예약현황';
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    // 파일명 생성
+    const today = new Date().toISOString().split('T')[0];
+    const fileName = `${sheetName}_${today}.xlsx`;
+
+    // 엑셀 파일 다운로드
+    XLSX.writeFile(wb, fileName);
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
       {/* 상단 타이틀 + 버튼/필터 */}
@@ -63,7 +119,10 @@ export default function Reservations() {
             <option value="이번주">이번주</option>
             <option value="이번달">이번달</option>
           </select>
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]">
+          <button 
+            className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)] hover:bg-[var(--bgTertiary)] transition"
+            onClick={exportToExcel}
+          >
             <FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 예약 현황 내보내기
           </button>
           <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => navigate('/qr')}><FontAwesomeIcon icon={faQrcode} className="w-5 h-5" /> QR 미제출자 확인</button>

@@ -9,7 +9,8 @@ import {
   faTrash,
   faPlus,
   faDownload,
-  faMagnifyingGlass
+  faMagnifyingGlass,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons';
 
 const sponsorStats = [
@@ -41,12 +42,51 @@ export default function Sponser() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('전체');
   const [status, setStatus] = useState('전체');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [postsState, setPosts] = useState(posts);
+  const [form, setForm] = useState({
+    title: '',
+    content: '',
+    isFixed: false,
+    isNew: true,
+    image: null
+  });
 
-  const filtered = sortedPosts.filter(
+  const filtered = postsState.filter(
     p => (!search || p.title.includes(search)) &&
       (category === '전체' || p.category === category) &&
       (status === '전체' || p.status === status)
   );
+
+  const handleAddPost = (e) => {
+    e.preventDefault();
+    if (!form.title || !form.content) return;
+    
+    const newPost = {
+      id: postsState.length + 1,
+      title: form.title,
+      content: form.content,
+      isNew: form.isNew,
+      isFixed: form.isFixed,
+      category: '감사인사',
+      author: '관리자',
+      status: '게시중',
+      views: 0,
+      date: new Date().toISOString().split('T')[0],
+      image: form.image
+    };
+    
+    setPosts([newPost, ...postsState]);
+    setForm({ title: '', content: '', isFixed: false, isNew: true, image: null });
+    setModalOpen(false);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setForm({...form, image: file});
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
@@ -54,8 +94,12 @@ export default function Sponser() {
       <div className="flex items-center justify-between px-10 pt-10 pb-2 mb-6">
         <h1 className="text-3xl font-bold text-[var(--contentMain)]">후원 현황 관리</h1>
         <div className="flex gap-2">
-          <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"><FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 게시글 내보내기</button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2"><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 감사 게시글 작성</button>
+          <button 
+            className="button-primary-m flex items-center gap-1 px-4 py-2"
+            onClick={() => setModalOpen(true)}
+          >
+            <FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 감사 게시글 작성
+          </button>
         </div>
       </div>
       {/* 통계 카드 */}
@@ -163,6 +207,114 @@ export default function Sponser() {
           ))}
         </div>
       </div>
+      
+      {/* 감사 게시글 작성 모달 */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[var(--contentMain)]">감사 게시글 작성</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700"
+                onClick={() => setModalOpen(false)}
+              >
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddPost} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  제목 *
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                  placeholder="게시글 제목을 입력하세요"
+                  value={form.title}
+                  onChange={(e) => setForm({...form, title: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  내용 *
+                </label>
+                <textarea
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] resize-none"
+                  rows="6"
+                  placeholder="감사 인사 내용을 입력하세요"
+                  value={form.content}
+                  onChange={(e) => setForm({...form, content: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    이미지 첨부 (선택)
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                  />
+                  {form.image && (
+                    <p className="text-xs text-[var(--contentCaption)] mt-1">
+                      선택된 파일: {form.image.name}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isFixed"
+                    checked={form.isFixed}
+                    onChange={(e) => setForm({...form, isFixed: e.target.checked})}
+                  />
+                  <label htmlFor="isFixed" className="text-sm text-[var(--contentMain)]">
+                    고정 게시글로 설정
+                  </label>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isNew"
+                    checked={form.isNew}
+                    onChange={(e) => setForm({...form, isNew: e.target.checked})}
+                  />
+                  <label htmlFor="isNew" className="text-sm text-[var(--contentMain)]">
+                    NEW 표시
+                  </label>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold"
+                  onClick={() => setModalOpen(false)}
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded bg-[var(--primaryBlue)] text-white font-semibold hover:bg-[var(--blue700)]"
+                >
+                  등록
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
