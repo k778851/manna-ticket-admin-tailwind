@@ -22,6 +22,7 @@ const notices = [
   {
     id: 1,
     title: '5월 식단 변경 안내',
+    content: '5월부터 점심 메뉴가 변경됩니다. 새로운 식단은 더욱 건강하고 맛있게 준비되었습니다. 많은 관심 부탁드립니다.',
     isNew: true,
     isFixed: true,
     priority: '높음',
@@ -32,6 +33,7 @@ const notices = [
   {
     id: 2,
     title: '시설 점검 안내',
+    content: '주방 시설 점검으로 인해 4월 30일 오후 2시부터 6시까지 식사 서비스가 중단됩니다. 불편을 끼쳐 죄송합니다.',
     isNew: false,
     isFixed: false,
     priority: '보통',
@@ -45,6 +47,8 @@ export default function Notice() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('전체');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [noticesState, setNotices] = useState(notices);
   const [form, setForm] = useState({
     title: '',
@@ -53,6 +57,15 @@ export default function Notice() {
     isFixed: false,
     isNew: true
   });
+  const [editForm, setEditForm] = useState({
+    id: null,
+    title: '',
+    content: '',
+    priority: '보통',
+    isFixed: false,
+    isNew: true
+  });
+  const [selectedNotice, setSelectedNotice] = useState(null);
 
   const filtered = noticesState.filter(n =>
     (!search || n.title.includes(search)) &&
@@ -78,6 +91,46 @@ export default function Notice() {
     setNotices([newNotice, ...noticesState]);
     setForm({ title: '', content: '', priority: '보통', isFixed: false, isNew: true });
     setModalOpen(false);
+  };
+
+  // 상세보기 함수
+  const handleViewClick = (notice) => {
+    setSelectedNotice(notice);
+    setViewModalOpen(true);
+  };
+
+  // 편집 모달 열기 함수
+  const handleEditClick = (notice) => {
+    setEditForm({
+      id: notice.id,
+      title: notice.title,
+      content: notice.content,
+      priority: notice.priority,
+      isFixed: notice.isFixed,
+      isNew: notice.isNew
+    });
+    setEditModalOpen(true);
+  };
+
+  // 편집 저장 함수
+  const handleEditSave = (e) => {
+    e.preventDefault();
+    if (!editForm.title || !editForm.content) return;
+    
+    setNotices(noticesState.map(notice => 
+      notice.id === editForm.id 
+        ? { ...notice, ...editForm }
+        : notice
+    ));
+    setEditModalOpen(false);
+    setEditForm({ id: null, title: '', content: '', priority: '보통', isFixed: false, isNew: true });
+  };
+
+  // 삭제 함수
+  const handleDeleteNotice = (noticeId) => {
+    if (window.confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
+      setNotices(noticesState.filter(notice => notice.id !== noticeId));
+    }
   };
 
   return (
@@ -147,9 +200,9 @@ export default function Notice() {
                 <td className="py-3 px-2 text-center">{n.views}회</td>
                 <td className="py-3 px-2 text-center">{n.date}</td>
                 <td className="py-3 px-2 text-center">
-                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세"><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
-                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
-                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세" onClick={() => handleViewClick(n)}><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정" onClick={() => handleEditClick(n)}><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제" onClick={() => handleDeleteNotice(n.id)}><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
                 </td>
               </tr>
             ))}
@@ -253,6 +306,145 @@ export default function Notice() {
                   className="flex-1 py-2 rounded bg-[var(--primaryBlue)] text-white font-semibold hover:bg-[var(--blue700)]"
                 >
                   등록
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 상세보기 모달 */}
+      {viewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[var(--contentMain)]">공지사항 상세보기</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700"
+                onClick={() => setViewModalOpen(false)}
+              >
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <div className="text-sm text-[var(--contentMain)] mb-4">
+              <strong>제목:</strong> {selectedNotice?.title}
+            </div>
+            <div className="text-sm text-[var(--contentMain)] mb-4">
+              <strong>내용:</strong> {selectedNotice?.content}
+            </div>
+            <div className="text-sm text-[var(--contentMain)] mb-4">
+              <strong>중요도:</strong> {selectedNotice?.priority}
+            </div>
+            <div className="text-sm text-[var(--contentMain)] mb-4">
+              <strong>상태:</strong> {selectedNotice?.status}
+            </div>
+            <div className="text-sm text-[var(--contentMain)] mb-4">
+              <strong>조회수:</strong> {selectedNotice?.views}
+            </div>
+            <div className="text-sm text-[var(--contentMain)] mb-4">
+              <strong>작성일:</strong> {selectedNotice?.date}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 편집 모달 */}
+      {editModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[var(--contentMain)]">공지사항 편집</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700"
+                onClick={() => setEditModalOpen(false)}
+              >
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  제목 *
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                  placeholder="공지사항 제목을 입력하세요"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  내용 *
+                </label>
+                <textarea
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] resize-none"
+                  rows="6"
+                  placeholder="공지사항 내용을 입력하세요"
+                  value={editForm.content}
+                  onChange={(e) => setEditForm({...editForm, content: e.target.value})}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    중요도
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                    value={editForm.priority}
+                    onChange={(e) => setEditForm({...editForm, priority: e.target.value})}
+                  >
+                    <option value="보통">보통</option>
+                    <option value="높음">높음</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2 mt-6">
+                  <input
+                    type="checkbox"
+                    id="isFixed"
+                    checked={editForm.isFixed}
+                    onChange={(e) => setEditForm({...editForm, isFixed: e.target.checked})}
+                  />
+                  <label htmlFor="isFixed" className="text-sm text-[var(--contentMain)]">
+                    고정 공지로 설정
+                  </label>
+                </div>
+                
+                <div className="flex items-center gap-2 mt-6">
+                  <input
+                    type="checkbox"
+                    id="isNew"
+                    checked={editForm.isNew}
+                    onChange={(e) => setEditForm({...editForm, isNew: e.target.checked})}
+                  />
+                  <label htmlFor="isNew" className="text-sm text-[var(--contentMain)]">
+                    NEW 표시
+                  </label>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold"
+                  onClick={() => setEditModalOpen(false)}
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded bg-[var(--primaryBlue)] text-white font-semibold hover:bg-[var(--blue700)]"
+                >
+                  저장
                 </button>
               </div>
             </form>

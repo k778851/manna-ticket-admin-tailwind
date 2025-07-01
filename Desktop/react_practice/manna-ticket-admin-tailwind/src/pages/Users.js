@@ -30,7 +30,9 @@ export default function Users() {
   const [users, setUsers] = useState(initialUsers);
   const [modalOpen, setModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [form, setForm] = useState({ name: '', personalNumber: '', department: '' });
+  const [editForm, setEditForm] = useState({ id: null, name: '', personalNumber: '', department: '' });
 
   const filteredUsers = users.filter(
     (u) =>
@@ -54,6 +56,38 @@ export default function Users() {
     ]);
     setForm({ name: '', personalNumber: '', department: '' });
     setModalOpen(false);
+  };
+
+  // 편집 모달 열기 함수
+  const handleEditClick = (user) => {
+    setEditForm({
+      id: user.id,
+      name: user.name,
+      personalNumber: user.personalNumber,
+      department: user.department
+    });
+    setEditModalOpen(true);
+  };
+
+  // 편집 저장 함수
+  const handleEditSave = (e) => {
+    e.preventDefault();
+    if (!editForm.name || !editForm.personalNumber || !editForm.department) return;
+    
+    setUsers(users.map(user => 
+      user.id === editForm.id 
+        ? { ...user, name: editForm.name, personalNumber: editForm.personalNumber, department: editForm.department }
+        : user
+    ));
+    setEditModalOpen(false);
+    setEditForm({ id: null, name: '', personalNumber: '', department: '' });
+  };
+
+  // 사용자 삭제 함수
+  const handleDeleteUser = (userId) => {
+    if (window.confirm('정말로 이 사용자를 삭제하시겠습니까?')) {
+      setUsers(users.filter(user => user.id !== userId));
+    }
   };
 
   // 템플릿 다운로드 함수
@@ -259,8 +293,8 @@ export default function Users() {
                     </div>
                   </td>
                   <td className="py-2 text-center">
-                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
-                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded"><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
+                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded" onClick={() => handleEditClick(row)}><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                    <button className="p-1 hover:bg-[var(--bgTertiary)] rounded" onClick={() => handleDeleteUser(row.id)}><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -314,6 +348,70 @@ export default function Users() {
                 닫기
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* 사용자 편집 모달 */}
+      {editModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[var(--contentMain)]">사용자 편집</h3>
+              <button className="text-gray-400 hover:text-gray-700" onClick={() => setEditModalOpen(false)}>
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-[var(--contentMain)] mb-2">이름</h4>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full p-2 border border-[var(--borderInput)] rounded"
+                />
+              </div>
+              <div>
+                <h4 className="font-semibold text-[var(--contentMain)] mb-2">고유번호</h4>
+                <input
+                  type="text"
+                  value={editForm.personalNumber}
+                  onChange={(e) => setEditForm({ ...editForm, personalNumber: e.target.value })}
+                  className="w-full p-2 border border-[var(--borderInput)] rounded"
+                />
+              </div>
+              <div>
+                <h4 className="font-semibold text-[var(--contentMain)] mb-2">부서</h4>
+                <select
+                  value={editForm.department}
+                  onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
+                  className="w-full p-2 border border-[var(--borderInput)] rounded"
+                >
+                  <option value="" disabled>부서 선택</option>
+                  {departmentList.map(dep => (
+                    <option key={dep} value={dep}>{dep}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+                         <div className="flex gap-2 mt-4">
+               <button 
+                 type="button"
+                 className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" 
+                 onClick={() => setEditModalOpen(false)}
+               >
+                 취소
+               </button>
+               <button 
+                 type="submit"
+                 className="flex-1 py-2 rounded bg-blue-500 text-white font-semibold" 
+                 onClick={handleEditSave}
+               >
+                 저장
+               </button>
+             </div>
           </div>
         </div>
       )}

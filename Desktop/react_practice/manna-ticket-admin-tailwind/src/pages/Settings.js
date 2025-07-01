@@ -28,9 +28,100 @@ const Settings = () => {
   const [adminEmail, setAdminEmail] = useState('admin@example.com');
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30);
+  
+  // API 설정 상태
+  const [apiBaseUrl, setApiBaseUrl] = useState('http://api.example.com');
+  const [apiConnectionStatus, setApiConnectionStatus] = useState('success'); // 'success', 'connecting', 'fail'
+  const [apiEndpoints, setApiEndpoints] = useState([
+    { name: '로그인', method: 'POST', path: '/auth/login', status: 'success' },
+    { name: '사용자 정보', method: 'GET', path: '/users', status: 'success' },
+    { name: '예약 관리', method: 'GET/POST', path: '/reservations', status: 'success' },
+    { name: '공지사항', method: 'GET/POST', path: '/notices', status: 'fail' },
+    { name: '식단 관리', method: 'GET/POST', path: '/menus', status: 'success' },
+  ]);
+  const [systemVersion, setSystemVersion] = useState('v1.0.0');
+  const [minVersion, setMinVersion] = useState('5호');
+  const [maxCalls, setMaxCalls] = useState('1회');
+  const [lastUpdate, setLastUpdate] = useState('2024. 5. 29');
+  const [retryInterval, setRetryInterval] = useState('5분');
 
   const handleBasicSave = () => {
-    console.log('저장됨:', { siteName, adminEmail, autoRefresh, refreshInterval });
+    console.log('기본 설정 저장됨:', { siteName, adminEmail, autoRefresh, refreshInterval });
+    // 실제로는 API 호출하여 저장
+    alert('기본 설정이 저장되었습니다.');
+  };
+
+  // API 기본 URL 연결 테스트
+  const handleApiConnectionTest = async () => {
+    setApiConnectionStatus('connecting');
+    
+    // 실제 API 연결 테스트 시뮬레이션
+    setTimeout(() => {
+      const isSuccess = Math.random() > 0.3; // 70% 성공 확률
+      setApiConnectionStatus(isSuccess ? 'success' : 'fail');
+      
+      if (isSuccess) {
+        alert('API 연결 테스트가 성공했습니다.');
+      } else {
+        alert('API 연결 테스트에 실패했습니다. URL을 확인해주세요.');
+      }
+    }, 2000);
+  };
+
+  // 개별 엔드포인트 테스트
+  const handleEndpointTest = async (endpointIndex) => {
+    const updatedEndpoints = [...apiEndpoints];
+    updatedEndpoints[endpointIndex] = { ...updatedEndpoints[endpointIndex], status: 'connecting' };
+    setApiEndpoints(updatedEndpoints);
+    
+    // 실제 엔드포인트 테스트 시뮬레이션
+    setTimeout(() => {
+      const isSuccess = Math.random() > 0.2; // 80% 성공 확률
+      updatedEndpoints[endpointIndex] = { 
+        ...updatedEndpoints[endpointIndex], 
+        status: isSuccess ? 'success' : 'fail' 
+      };
+      setApiEndpoints(updatedEndpoints);
+      
+      if (isSuccess) {
+        alert(`${updatedEndpoints[endpointIndex].name} 엔드포인트 테스트가 성공했습니다.`);
+      } else {
+        alert(`${updatedEndpoints[endpointIndex].name} 엔드포인트 테스트에 실패했습니다.`);
+      }
+    }, 1500);
+  };
+
+  // 엔드포인트 경로 수정
+  const handleEndpointPathChange = (index, newPath) => {
+    const updatedEndpoints = [...apiEndpoints];
+    updatedEndpoints[index] = { ...updatedEndpoints[index], path: newPath };
+    setApiEndpoints(updatedEndpoints);
+  };
+
+  // 엔드포인트 저장
+  const handleEndpointSave = (index) => {
+    const endpoint = apiEndpoints[index];
+    console.log('엔드포인트 저장됨:', endpoint);
+    alert(`${endpoint.name} 엔드포인트가 저장되었습니다.`);
+  };
+
+  // 시스템 설정 저장
+  const handleSystemSave = () => {
+    console.log('시스템 설정 저장됨:', { systemVersion, minVersion, maxCalls });
+    setLastUpdate(new Date().toLocaleDateString('ko-KR'));
+    alert('시스템 설정이 저장되었습니다.');
+  };
+
+  // 보안 설정 저장
+  const handleSecuritySave = () => {
+    console.log('보안 설정 저장됨');
+    alert('보안 설정이 저장되었습니다.');
+  };
+
+  // 재시도 주기 변경
+  const handleRetryIntervalChange = (newInterval) => {
+    setRetryInterval(newInterval);
+    console.log('재시도 주기가 변경되었습니다:', newInterval);
   };
 
   return (
@@ -112,37 +203,48 @@ const Settings = () => {
       )}
       {tab === 1 && (
         <div className="flex flex-col gap-6 px-10 mb-10">
-          {/* API 연동 상태 샘플 */}
-          <div className="font-bold text-[var(--contentMain)] mb-2 mt-2">API 연동 상태 샘플</div>
-          {/* 성공 상태 */}
-          <div className="bg-[#e6fffb] border border-[#87e8de] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
-            <FontAwesomeIcon icon={faCheckCircle} className="w-4 h-4 text-green-500" />
-            <span className="font-semibold text-[var(--contentMain)]">API 연동 성공</span>
-            <span className="text-sm text-green-500 ml-4">API 서버와 정상적으로 연결되었습니다.</span>
-          </div>
-          {/* 진행중 상태 */}
-          <div className="bg-[#f0f5ff] border border-[#adc6ff] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
-            <FontAwesomeIcon icon={faRefresh} spin className="w-4 h-4 text-blue-500" />
-            <span className="font-semibold text-[var(--contentMain)]">API 연동 시도중...</span>
-            <span className="text-sm text-blue-500 ml-4">API 서버에 연결을 시도하고 있습니다.</span>
-          </div>
-          {/* 실패 상태 (기존) */}
-          <div className="bg-[#fff7e6] border border-[#ffe58f] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faExclamationTriangle} className="w-4 h-4 text-red-500" />
-              <span className="font-semibold text-[var(--contentMain)]">API 연동 실패</span>
+          {/* API 연동 상태 */}
+          <div className="font-bold text-[var(--contentMain)] mb-2 mt-2">API 연동 상태</div>
+          
+          {/* 동적 상태 표시 */}
+          {apiConnectionStatus === 'success' && (
+            <div className="bg-[#e6fffb] border border-[#87e8de] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
+              <FontAwesomeIcon icon={faCheckCircle} className="w-4 h-4 text-green-500" />
+              <span className="font-semibold text-[var(--contentMain)]">API 연동 성공</span>
+              <span className="text-sm text-green-500 ml-4">API 서버와 정상적으로 연결되었습니다.</span>
             </div>
-            <span className="text-sm text-[#faad14] ml-4">API 서버와의 연결에 실패했습니다. 서버 상태를 확인하거나 네트워크를 점검해 주세요.</span>
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-sm">재시도 주기:</span>
-              <select className="border border-gray-300 rounded px-2 py-1 bg-white text-sm">
-                <option>1분</option>
-                <option selected>5분</option>
-                <option>10분</option>
-              </select>
+          )}
+          
+          {apiConnectionStatus === 'connecting' && (
+            <div className="bg-[#f0f5ff] border border-[#adc6ff] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
+              <FontAwesomeIcon icon={faRefresh} spin className="w-4 h-4 text-blue-500" />
+              <span className="font-semibold text-[var(--contentMain)]">API 연동 시도중...</span>
+              <span className="text-sm text-blue-500 ml-4">API 서버에 연결을 시도하고 있습니다.</span>
             </div>
-            <span className="ml-4 text-xs text-red-400 font-semibold">연결 실패</span>
-          </div>
+          )}
+          
+          {apiConnectionStatus === 'fail' && (
+            <div className="bg-[#fff7e6] border border-[#ffe58f] rounded-lg px-6 py-4 flex items-center gap-4 shadow-sm">
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={faExclamationTriangle} className="w-4 h-4 text-red-500" />
+                <span className="font-semibold text-[var(--contentMain)]">API 연동 실패</span>
+              </div>
+              <span className="text-sm text-[#faad14] ml-4">API 서버와의 연결에 실패했습니다. 서버 상태를 확인하거나 네트워크를 점검해 주세요.</span>
+              <div className="ml-auto flex items-center gap-2">
+                <span className="text-sm">재시도 주기:</span>
+                <select 
+                  className="border border-gray-300 rounded px-2 py-1 bg-white text-sm"
+                  value={retryInterval}
+                  onChange={(e) => handleRetryIntervalChange(e.target.value)}
+                >
+                  <option>1분</option>
+                  <option>5분</option>
+                  <option>10분</option>
+                </select>
+              </div>
+              <span className="ml-4 text-xs text-red-400 font-semibold">연결 실패</span>
+            </div>
+          )}
 
           {/* API 기본 URL 카드 */}
           <div className="bg-white rounded-lg shadow-sm border border-[var(--borderOutline)] p-6 flex flex-col gap-2">
@@ -152,8 +254,17 @@ const Settings = () => {
             </div>
             <div className="text-xs text-[var(--contentCaption)] mb-2">모든 API 요청의 기본 URL을 입력하세요.</div>
             <div className="flex gap-2 items-center">
-              <input type="text" className="flex-1 border border-[var(--borderInput)] rounded px-3 py-2 text-sm focus:outline-none focus:border-[var(--primaryBlue)]" placeholder="http://api.example.com" />
-              <button className="ml-2 px-3 py-2 bg-[var(--primaryBlue)] text-white rounded text-sm flex items-center gap-2 hover:bg-[var(--blue700)] transition">
+              <input 
+                type="text" 
+                className="flex-1 border border-[var(--borderInput)] rounded px-3 py-2 text-sm focus:outline-none focus:border-[var(--primaryBlue)]" 
+                placeholder="http://api.example.com"
+                value={apiBaseUrl}
+                onChange={(e) => setApiBaseUrl(e.target.value)}
+              />
+              <button 
+                className="ml-2 px-3 py-2 bg-[var(--primaryBlue)] text-white rounded text-sm flex items-center gap-2 hover:bg-[var(--blue700)] transition"
+                onClick={handleApiConnectionTest}
+              >
                 <FontAwesomeIcon icon={faCheckCircle} className="w-4 h-4" />
                 연결 테스트
               </button>
@@ -169,26 +280,32 @@ const Settings = () => {
             <div className="text-xs text-[var(--contentCaption)] mb-2">각 기능별 API 엔드포인트를 설정할 수 있습니다.</div>
             <div className="flex flex-col gap-3">
               {/* 엔드포인트 목록 */}
-              {[
-                { name: '로그인', method: 'POST', path: '/auth/login', status: 'success' },
-                { name: '사용자 정보', method: 'GET', path: '/users', status: 'success' },
-                { name: '예약 관리', method: 'GET/POST', path: '/reservations', status: 'success' },
-                { name: '공지사항', method: 'GET/POST', path: '/notices', status: 'fail' },
-                { name: '식단 관리', method: 'GET/POST', path: '/menus', status: 'success' },
-              ].map((ep, idx) => (
+              {apiEndpoints.map((ep, idx) => (
                 <div key={ep.name} className="flex items-center gap-2 border-b last:border-b-0 py-2">
                   <FontAwesomeIcon 
-                    icon={ep.status === 'success' ? faCheckCircle : faTimesCircle} 
-                    className={`w-4 h-4 ${ep.status === 'success' ? 'text-green-500' : 'text-red-500'}`} 
+                    icon={ep.status === 'success' ? faCheckCircle : ep.status === 'connecting' ? faRefresh : faTimesCircle} 
+                    className={`w-4 h-4 ${ep.status === 'success' ? 'text-green-500' : ep.status === 'connecting' ? 'text-blue-500' : 'text-red-500'}`}
+                    spin={ep.status === 'connecting'}
                   />
                   <span className="text-xs font-semibold text-[var(--contentMain)] w-20">{ep.name}</span>
                   <span className="text-xs text-gray-500 w-16">{ep.method}</span>
-                  <input type="text" className="flex-1 border border-gray-200 rounded px-2 py-1 text-xs" value={ep.path} readOnly />
-                  <button className="ml-2 px-2 py-1 bg-gray-100 rounded text-xs border border-gray-200 flex items-center gap-1 hover:bg-gray-200 transition">
+                  <input 
+                    type="text" 
+                    className="flex-1 border border-gray-200 rounded px-2 py-1 text-xs" 
+                    value={ep.path} 
+                    onChange={(e) => handleEndpointPathChange(idx, e.target.value)}
+                  />
+                  <button 
+                    className="ml-2 px-2 py-1 bg-gray-100 rounded text-xs border border-gray-200 flex items-center gap-1 hover:bg-gray-200 transition"
+                    onClick={() => handleEndpointTest(idx)}
+                  >
                     <FontAwesomeIcon icon={faCheckCircle} className="w-3 h-3" />
                     테스트
                   </button>
-                  <button className="ml-1 px-2 py-1 bg-[var(--primaryBlue)] text-white rounded text-xs flex items-center gap-1 hover:bg-[var(--blue700)] transition">
+                  <button 
+                    className="ml-1 px-2 py-1 bg-[var(--primaryBlue)] text-white rounded text-xs flex items-center gap-1 hover:bg-[var(--blue700)] transition"
+                    onClick={() => handleEndpointSave(idx)}
+                  >
                     <FontAwesomeIcon icon={faSave} className="w-3 h-3" />
                     저장
                   </button>
@@ -208,22 +325,42 @@ const Settings = () => {
               <div className="flex gap-2 mb-2">
                 <div>
                   <label className="block text-xs mb-1">시스템 버전</label>
-                  <input type="text" className="border border-gray-200 rounded px-2 py-1 text-xs w-24" value="v1.0.0" readOnly />
+                  <input 
+                    type="text" 
+                    className="border border-gray-200 rounded px-2 py-1 text-xs w-24" 
+                    value={systemVersion} 
+                    onChange={(e) => setSystemVersion(e.target.value)}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs mb-1">최소요구버전</label>
-                  <select className="border border-gray-200 rounded px-2 py-1 text-xs w-20">
+                  <select 
+                    className="border border-gray-200 rounded px-2 py-1 text-xs w-20"
+                    value={minVersion}
+                    onChange={(e) => setMinVersion(e.target.value)}
+                  >
                     <option>5호</option>
+                    <option>6호</option>
+                    <option>7호</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs mb-1">최대 호출 횟수</label>
-                  <select className="border border-gray-200 rounded px-2 py-1 text-xs w-20">
+                  <select 
+                    className="border border-gray-200 rounded px-2 py-1 text-xs w-20"
+                    value={maxCalls}
+                    onChange={(e) => setMaxCalls(e.target.value)}
+                  >
                     <option>1회</option>
+                    <option>5회</option>
+                    <option>10회</option>
                   </select>
                 </div>
               </div>
-              <button className="mt-2 px-4 py-2 bg-[var(--primaryBlue)] text-white rounded text-sm font-semibold flex items-center gap-2 hover:bg-[var(--blue700)] transition">
+              <button 
+                className="mt-2 px-4 py-2 bg-[var(--primaryBlue)] text-white rounded text-sm font-semibold flex items-center gap-2 hover:bg-[var(--blue700)] transition"
+                onClick={handleSystemSave}
+              >
                 <FontAwesomeIcon icon={faSave} className="w-4 h-4" />
                 저장
               </button>
@@ -269,7 +406,10 @@ const Settings = () => {
               </label>
               <input type="checkbox" className="mt-1" />
             </div>
-            <button className="bg-[var(--primaryBlue)] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-[var(--blue700)] transition">
+            <button 
+              className="bg-[var(--primaryBlue)] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-[var(--blue700)] transition"
+              onClick={handleSecuritySave}
+            >
               <FontAwesomeIcon icon={faSave} className="w-4 h-4" />
               저장
             </button>

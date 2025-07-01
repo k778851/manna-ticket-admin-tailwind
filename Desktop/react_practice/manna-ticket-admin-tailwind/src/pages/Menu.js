@@ -80,6 +80,8 @@ export default function Menu() {
     allergy: '',
   });
   const [sameAsLunch, setSameAsLunch] = useState(false);
+  const [weekSameAsLunch, setWeekSameAsLunch] = useState([false, false, false, false, false]); // 각 요일별 체크박스 상태
+  const [allWeekSameAsLunch, setAllWeekSameAsLunch] = useState(false); // 전체 주간 점심=저녁 체크박스 상태
   const [weekForm, setWeekForm] = useState([
     { day: '월', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
     { day: '화', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
@@ -157,10 +159,30 @@ export default function Menu() {
     if (isEditing) {
       // 수정 모드
       if (editingWeekIndex !== null) {
-        // 개별 행 수정
+        // 개별 행 수정 - 해당 주의 모든 메뉴를 업데이트
         const updatedMenus = [...weekMenusState];
-        updatedMenus[editingWeekIndex] = weekForm[0];
-        setWeekMenus(updatedMenus);
+        
+        // 기존 주간 메뉴에서 해당 주의 메뉴들을 찾아서 업데이트
+        const targetDate = weekForm[0].date;
+        const targetWeekStart = new Date(targetDate);
+        targetWeekStart.setDate(targetWeekStart.getDate() - targetWeekStart.getDay() + 1); // 월요일로 설정
+        
+        // 해당 주의 메뉴들을 필터링하고 업데이트
+        const weekStartStr = targetWeekStart.toISOString().split('T')[0];
+        const weekEnd = new Date(targetWeekStart);
+        weekEnd.setDate(targetWeekStart.getDate() + 4); // 금요일
+        const weekEndStr = weekEnd.toISOString().split('T')[0];
+        
+        // 해당 주의 메뉴들을 제거
+        const filteredMenus = updatedMenus.filter(menu => {
+          const menuDate = new Date(menu.date);
+          const menuDateStr = menuDate.toISOString().split('T')[0];
+          return menuDateStr < weekStartStr || menuDateStr > weekEndStr;
+        });
+        
+        // 새로운 주간 메뉴 추가
+        const newWeekMenus = weekForm.filter(day => day.lunch.main || day.dinner.main);
+        setWeekMenus([...filteredMenus, ...newWeekMenus]);
         setEditingWeekIndex(null);
       } else {
         // 전체 주간 메뉴 수정
@@ -179,6 +201,8 @@ export default function Menu() {
       { day: '목', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
       { day: '금', date: '', lunch: { main: '', type: '', sides: '' }, dinner: { main: '', type: '', sides: '' } },
     ]);
+    setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+    setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
     setModalOpen(false);
   };
 
@@ -273,6 +297,22 @@ export default function Menu() {
     reader.readAsArrayBuffer(file);
   };
 
+  // 주간 날짜 자동 계산 함수
+  const calculateWeekDates = (mondayDate) => {
+    if (!mondayDate) return;
+    
+    const monday = new Date(mondayDate);
+    const weekDates = [];
+    
+    for (let i = 0; i < 5; i++) {
+      const currentDate = new Date(monday);
+      currentDate.setDate(monday.getDate() + i);
+      weekDates.push(currentDate.toISOString().split('T')[0]);
+    }
+    
+    return weekDates;
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
       {/* 상단 타이틀 + 버튼 */}
@@ -282,38 +322,72 @@ export default function Menu() {
           <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]" onClick={() => setUploadModalOpen(true)}>
             <FontAwesomeIcon icon={faUpload} size="lg" /> 주간메뉴 일괄 업로드
           </button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => { 
-            setModalType('today'); 
-            setIsEditing(false);
-            setEditingIndex(null);
-            setForm({ type: '점심 메뉴', date: '', main: '', sides: '', soup: '', allergy: '' });
-            setModalOpen(true); 
-          }}><FontAwesomeIcon icon={faPlus} size="lg" /> 메뉴 추가</button>
+          {tab === 0 && (
+            <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => { 
+              setModalType('today'); 
+              setIsEditing(false);
+              setEditingIndex(null);
+              setForm({ type: '점심 메뉴', date: '', main: '', sides: '', soup: '', allergy: '' });
+              setModalOpen(true); 
+            }}>
+              <FontAwesomeIcon icon={faPlus} size="lg" /> 메뉴 추가
+            </button>
+          )}
+          {tab === 1 && (
+            <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={()=>{ 
+              setModalType('week'); 
+              setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+              setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
+              setModalOpen(true); 
+            }}>
+              <FontAwesomeIcon icon={faPlus} size="lg" /> 주간 메뉴 생성
+            </button>
+          )}
         </div>
       </div>
       {/* 메뉴 등록 모달 */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-[90vw] max-w-none flex flex-col gap-4 relative">
-            <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-700" onClick={() => setModalOpen(false)}><FontAwesomeIcon icon={faXmark} size="lg" /></button>
-            <div className="flex gap-2 mb-2">
-              <button className={`flex-1 py-2 rounded ${modalType==='today' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={()=>setModalType('today')}>오늘의 메뉴 등록</button>
-              <button className={`flex-1 py-2 rounded ${modalType==='week' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={()=>setModalType('week')}>주간 메뉴 등록</button>
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[var(--contentMain)]">
+                {isEditing ? '메뉴 수정' : '메뉴 추가'}
+              </h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700"
+                onClick={() => {
+                  setModalOpen(false);
+                  setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+                  setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
+                }}
+              >
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
             </div>
+            
             {modalType === 'today' ? (
-              <form className="flex flex-col gap-3" onSubmit={handleAddMenu}>
-                <select className="border rounded px-3 py-2 text-sm" value={form.type} onChange={e=>{
-                  setForm({...form, type: e.target.value});
-                  // 저녁 메뉴 선택 시 체크박스 초기화
-                  if (e.target.value === '점심 메뉴') {
-                    setSameAsLunch(false);
-                  }
-                }}>
-                  <option value="점심 메뉴">점심 메뉴</option>
-                  <option value="저녁 메뉴">저녁 메뉴</option>
-                </select>
+              <form onSubmit={handleAddMenu} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    메뉴 타입 *
+                  </label>
+                  <select 
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                    value={form.type} 
+                    onChange={e => {
+                      setForm({...form, type: e.target.value});
+                      if (e.target.value === '점심 메뉴') {
+                        setSameAsLunch(false);
+                      }
+                    }}
+                  >
+                    <option value="점심 메뉴">점심 메뉴</option>
+                    <option value="저녁 메뉴">저녁 메뉴</option>
+                  </select>
+                </div>
+                
                 {form.type === '저녁 메뉴' && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 p-3 bg-[var(--bgTertiary)] rounded">
                     <input 
                       type="checkbox" 
                       id="sameAsLunch" 
@@ -321,7 +395,6 @@ export default function Menu() {
                       onChange={(e) => {
                         setSameAsLunch(e.target.checked);
                         if (e.target.checked) {
-                          // 점심 메뉴 찾기
                           const lunchMenu = todayMenusState.find(menu => menu.type === '점심 메뉴');
                           if (lunchMenu) {
                             setForm({
@@ -335,57 +408,315 @@ export default function Menu() {
                         }
                       }}
                     />
-                    <label htmlFor="sameAsLunch" className="text-sm text-gray-700">점심 메뉴와 동일</label>
+                    <label htmlFor="sameAsLunch" className="text-sm text-[var(--contentMain)]">점심 메뉴와 동일</label>
                   </div>
                 )}
-                <input 
-                  type="date" 
-                  className="border rounded px-3 py-2 text-sm" 
-                  value={form.date.split(' | ')[0] || ''} 
-                  onChange={e => {
-                    setForm({...form, date: e.target.value});
-                  }}
-                  required
-                />
-                <input className="border rounded px-3 py-2 text-sm" placeholder="주요리" value={form.main} onChange={e=>setForm({...form, main: e.target.value})} required disabled={sameAsLunch}/>
-                <input className="border rounded px-3 py-2 text-sm" placeholder="반찬" value={form.sides} onChange={e=>setForm({...form, sides: e.target.value})} required disabled={sameAsLunch}/>
-                <input className="border rounded px-3 py-2 text-sm" placeholder="국물" value={form.soup} onChange={e=>setForm({...form, soup: e.target.value})} disabled={sameAsLunch}/> 
-                <input className="border rounded px-3 py-2 text-sm" placeholder="알레르기 정보" value={form.allergy} onChange={e=>setForm({...form, allergy: e.target.value})} disabled={sameAsLunch}/>
-                <div className="flex gap-2 mt-2">
-                  <button type="button" className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" onClick={()=>{
-                    setModalOpen(false);
-                    setSameAsLunch(false);
-                  }}>취소</button>
-                  <button type="submit" className="flex-1 py-2 rounded bg-blue-500 text-white font-semibold">저장</button>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    날짜 *
+                  </label>
+                  <input 
+                    type="date" 
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                    value={form.date.split(' | ')[0] || ''} 
+                    onChange={e => setForm({...form, date: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    주요리 *
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                    placeholder="주요리를 입력하세요" 
+                    value={form.main} 
+                    onChange={e => setForm({...form, main: e.target.value})} 
+                    required 
+                    disabled={sameAsLunch}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    반찬 *
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                    placeholder="반찬을 입력하세요" 
+                    value={form.sides} 
+                    onChange={e => setForm({...form, sides: e.target.value})} 
+                    required 
+                    disabled={sameAsLunch}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    국물
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                    placeholder="국물을 입력하세요" 
+                    value={form.soup} 
+                    onChange={e => setForm({...form, soup: e.target.value})} 
+                    disabled={sameAsLunch}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                    알레르기 정보
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                    placeholder="알레르기 정보를 입력하세요" 
+                    value={form.allergy} 
+                    onChange={e => setForm({...form, allergy: e.target.value})} 
+                    disabled={sameAsLunch}
+                  />
+                </div>
+                
+                <div className="flex gap-2 pt-4">
+                  <button 
+                    type="button" 
+                    className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" 
+                    onClick={() => {
+                      setModalOpen(false);
+                      setSameAsLunch(false);
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="flex-1 py-2 rounded bg-[var(--primaryBlue)] text-white font-semibold hover:bg-[var(--blue700)]"
+                  >
+                    {isEditing ? '수정' : '저장'}
+                  </button>
                 </div>
               </form>
             ) : (
-              <form className="flex flex-col gap-3" onSubmit={handleAddWeekMenu}>
+              <form onSubmit={handleAddWeekMenu} className="space-y-4">
+                {/* 주간 날짜 자동 설정 섹션 */}
+                <div className="p-4 bg-[var(--bgTertiary)] rounded-lg">
+                  <h4 className="font-semibold text-[var(--contentMain)] mb-3">주간 날짜 설정</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                          월요일 날짜 선택 (나머지 요일 자동 계산)
+                        </label>
+                        <input 
+                          type="date" 
+                          className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
+                          value={weekForm[0].date} 
+                          onChange={e => {
+                            const mondayDate = e.target.value;
+                            const weekDates = calculateWeekDates(mondayDate);
+                            
+                            if (weekDates) {
+                              const updatedWeekForm = weekForm.map((day, idx) => ({
+                                ...day,
+                                date: weekDates[idx]
+                              }));
+                              setWeekForm(updatedWeekForm);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="text-sm text-[var(--contentCaption)]">
+                        {isEditing ? '월요일 날짜를 변경하면 화~금요일이 자동으로 재계산됩니다.' : '월요일 날짜를 선택하면 화~금요일이 자동으로 설정됩니다.'}
+                      </div>
+                    </div>
+                    
+                    {/* 전체 주간 점심=저녁 체크박스 */}
+                    <div className="flex items-center gap-2 p-3 bg-white rounded border border-[var(--borderOutline)]">
+                      <input 
+                        type="checkbox" 
+                        id="allWeekSameAsLunch"
+                        checked={allWeekSameAsLunch} 
+                        onChange={(e) => {
+                          setAllWeekSameAsLunch(e.target.checked);
+                          
+                          if (e.target.checked) {
+                            // 모든 요일의 점심 메뉴를 저녁 메뉴에 복사
+                            const updatedWeekForm = weekForm.map(day => ({
+                              ...day,
+                              dinner: { ...day.lunch }
+                            }));
+                            setWeekForm(updatedWeekForm);
+                            
+                            // 모든 요일의 체크박스를 활성화
+                            setWeekSameAsLunch([true, true, true, true, true]);
+                          } else {
+                            // 모든 요일의 체크박스를 비활성화
+                            setWeekSameAsLunch([false, false, false, false, false]);
+                          }
+                        }}
+                      />
+                      <label htmlFor="allWeekSameAsLunch" className="text-sm font-medium text-[var(--contentMain)]">
+                        모든 요일 점심 메뉴와 저녁 메뉴 동일
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {weekForm.map((row, idx) => (
-                    <div key={row.day} className="border rounded p-3 mb-2">
-                      <div className="font-bold mb-1">{row.day}</div>
-                      <input className="border rounded px-3 py-2 text-sm mb-1 w-full" placeholder="날짜 (예: 2024-01-15)" value={row.date} onChange={e=>{
-                        const copy = [...weekForm]; copy[idx].date = e.target.value; setWeekForm(copy);
-                      }} required/>
-                      <div className="text-xs text-gray-500 mb-1 mt-2">점심</div>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-1">
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 주요리" value={row.lunch.main} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.main = e.target.value; setWeekForm(copy); }} required/>
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 종류" value={row.lunch.type} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.type = e.target.value; setWeekForm(copy); }} required/>
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="점심 반찬" value={row.lunch.sides} onChange={e=>{ const copy = [...weekForm]; copy[idx].lunch.sides = e.target.value; setWeekForm(copy); }} required/>
+                    <div key={row.day} className="border border-[var(--borderOutline)] rounded p-4">
+                      <div className="font-bold text-[var(--contentMain)] mb-3 text-center">{row.day}</div>
+                      
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-[var(--contentMain)] mb-1">
+                          날짜 *
+                        </label>
+                        <input 
+                          type="date"
+                          className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                          value={row.date} 
+                          onChange={e => {
+                            const copy = [...weekForm]; 
+                            copy[idx].date = e.target.value; 
+                            setWeekForm(copy);
+                          }} 
+                          required
+                        />
                       </div>
-                      <div className="text-xs text-gray-500 mb-1 mt-2">저녁</div>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 주요리" value={row.dinner.main} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.main = e.target.value; setWeekForm(copy); }} required/>
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 종류" value={row.dinner.type} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.type = e.target.value; setWeekForm(copy); }} required/>
-                        <input className="border rounded px-3 py-2 text-sm w-full" placeholder="저녁 반찬" value={row.dinner.sides} onChange={e=>{ const copy = [...weekForm]; copy[idx].dinner.sides = e.target.value; setWeekForm(copy); }} required/>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-[var(--contentMain)] mb-2">점심</div>
+                        <div className="space-y-2">
+                          <input 
+                            className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                            placeholder="점심 주요리" 
+                            value={row.lunch.main} 
+                            onChange={e => { 
+                              const copy = [...weekForm]; 
+                              copy[idx].lunch.main = e.target.value; 
+                              setWeekForm(copy); 
+                            }} 
+                            required
+                          />
+                          <input 
+                            className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                            placeholder="점심 종류" 
+                            value={row.lunch.type} 
+                            onChange={e => { 
+                              const copy = [...weekForm]; 
+                              copy[idx].lunch.type = e.target.value; 
+                              setWeekForm(copy); 
+                            }} 
+                            required
+                          />
+                          <input 
+                            className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                            placeholder="점심 반찬" 
+                            value={row.lunch.sides} 
+                            onChange={e => { 
+                              const copy = [...weekForm]; 
+                              copy[idx].lunch.sides = e.target.value; 
+                              setWeekForm(copy); 
+                            }} 
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium text-[var(--contentMain)] mb-2">저녁</div>
+                        
+                        {/* 점심 메뉴와 동일 체크박스 */}
+                        <div className="flex items-center gap-2 p-2 bg-[var(--bgTertiary)] rounded mb-2">
+                          <input 
+                            type="checkbox" 
+                            id={`sameAsLunch-${idx}`}
+                            checked={weekSameAsLunch[idx]} 
+                            onChange={(e) => {
+                              const newWeekSameAsLunch = [...weekSameAsLunch];
+                              newWeekSameAsLunch[idx] = e.target.checked;
+                              setWeekSameAsLunch(newWeekSameAsLunch);
+                              
+                              // 전체 체크박스 상태 업데이트
+                              const allChecked = newWeekSameAsLunch.every(checked => checked);
+                              setAllWeekSameAsLunch(allChecked);
+                              
+                              if (e.target.checked) {
+                                // 점심 메뉴 내용을 저녁 메뉴에 복사
+                                const copy = [...weekForm];
+                                copy[idx].dinner.main = copy[idx].lunch.main;
+                                copy[idx].dinner.type = copy[idx].lunch.type;
+                                copy[idx].dinner.sides = copy[idx].lunch.sides;
+                                setWeekForm(copy);
+                              }
+                            }}
+                          />
+                          <label htmlFor={`sameAsLunch-${idx}`} className="text-sm text-[var(--contentMain)]">점심 메뉴와 동일</label>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <input 
+                            className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                            placeholder="저녁 주요리" 
+                            value={row.dinner.main} 
+                            onChange={e => { 
+                              const copy = [...weekForm]; 
+                              copy[idx].dinner.main = e.target.value; 
+                              setWeekForm(copy); 
+                            }} 
+                            required
+                            disabled={weekSameAsLunch[idx]}
+                          />
+                          <input 
+                            className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                            placeholder="저녁 종류" 
+                            value={row.dinner.type} 
+                            onChange={e => { 
+                              const copy = [...weekForm]; 
+                              copy[idx].dinner.type = e.target.value; 
+                              setWeekForm(copy); 
+                            }} 
+                            required
+                            disabled={weekSameAsLunch[idx]}
+                          />
+                          <input 
+                            className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
+                            placeholder="저녁 반찬" 
+                            value={row.dinner.sides} 
+                            onChange={e => { 
+                              const copy = [...weekForm]; 
+                              copy[idx].dinner.sides = e.target.value; 
+                              setWeekForm(copy); 
+                            }} 
+                            required
+                            disabled={weekSameAsLunch[idx]}
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <button type="button" className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" onClick={()=>setModalOpen(false)}>취소</button>
-                  <button type="submit" className="flex-1 py-2 rounded bg-blue-500 text-white font-semibold">저장</button>
+                
+                <div className="flex gap-2 pt-4">
+                  <button 
+                    type="button" 
+                    className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" 
+                    onClick={() => {
+                      setModalOpen(false);
+                      setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+                      setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="flex-1 py-2 rounded bg-[var(--primaryBlue)] text-white font-semibold hover:bg-[var(--blue700)]"
+                  >
+                    {isEditing ? '수정' : '저장'}
+                  </button>
                 </div>
               </form>
             )}
@@ -515,17 +846,22 @@ export default function Menu() {
                 setModalType('week');
                 setIsEditing(true);
                 setEditingIndex(null);
-                setWeekForm(weekMenusState.map(menu => ({
+                
+                // 기존 주간 메뉴 데이터로 폼 설정
+                const existingWeekForm = weekMenusState.map(menu => ({
                   day: menu.day,
                   date: menu.date,
                   lunch: { ...menu.lunch },
                   dinner: { ...menu.dinner }
-                })));
+                }));
+                setWeekForm(existingWeekForm);
+                
+                setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+                setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
                 setModalOpen(true);
               }}>
                 <FontAwesomeIcon icon={faPenToSquare} size="lg" /> <span>주간 메뉴 편집</span>
               </button>
-              <button className="px-4 py-2 rounded bg-[var(--primaryBlue)] text-white text-sm font-semibold flex items-center gap-1 shadow-sm" onClick={()=>{ setModalType('week'); setModalOpen(true); }}><FontAwesomeIcon icon={faPlus} size="lg" /> <span>주간 메뉴 생성</span></button>
             </div>
           </div>
           <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] overflow-x-auto">
@@ -560,12 +896,27 @@ export default function Menu() {
                           setModalType('week');
                           setIsEditing(true);
                           setEditingWeekIndex(idx);
-                          setWeekForm([{
-                            day: row.day,
-                            date: row.date,
-                            lunch: { ...row.lunch },
-                            dinner: { ...row.dinner }
-                          }]);
+                          
+                          // 개별 행을 5일치 주간 메뉴로 확장
+                          const currentDate = new Date(row.date);
+                          const weekDates = [];
+                          for (let i = 0; i < 5; i++) {
+                            const date = new Date(currentDate);
+                            date.setDate(currentDate.getDate() - currentDate.getDay() + i + 1); // 월요일부터 시작
+                            weekDates.push(date.toISOString().split('T')[0]);
+                          }
+                          
+                          const weekDays = ['월', '화', '수', '목', '금'];
+                          const expandedWeekForm = weekDays.map((day, dayIdx) => ({
+                            day: day,
+                            date: weekDates[dayIdx],
+                            lunch: dayIdx === idx ? { ...row.lunch } : { main: '', type: '', sides: '' },
+                            dinner: dayIdx === idx ? { ...row.dinner } : { main: '', type: '', sides: '' }
+                          }));
+                          
+                          setWeekForm(expandedWeekForm);
+                          setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+                          setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
                           setModalOpen(true);
                         }}
                       >
