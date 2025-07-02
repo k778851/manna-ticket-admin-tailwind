@@ -18,7 +18,7 @@ import * as XLSX from 'xlsx';
 
 const todayMenus = [
   {
-    type: '점심 메뉴',
+    type: '점심',
     date: '2024-01-15 | 한식',
     main: '소불고기',
     sides: '밥, 계란말이, 시금치나물, 김치',
@@ -26,7 +26,7 @@ const todayMenus = [
     allergy: '대두, 계란',
   },
   {
-    type: '저녁 메뉴',
+    type: '저녁',
     date: '2024-01-15 | 양식',
     main: '치킨까스',
     sides: '밥, 샐러드, 감자튀김',
@@ -72,14 +72,14 @@ export default function Menu() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [form, setForm] = useState({
-    type: '점심 메뉴',
+    type: '점심',
     date: '',
     main: '',
     sides: '',
     soup: '',
     allergy: '',
   });
-  const [sameAsLunch, setSameAsLunch] = useState(false);
+
   const [weekSameAsLunch, setWeekSameAsLunch] = useState([false, false, false, false, false]); // 각 요일별 체크박스 상태
   const [allWeekSameAsLunch, setAllWeekSameAsLunch] = useState(false); // 전체 주간 점심=저녁 체크박스 상태
   const [weekForm, setWeekForm] = useState([
@@ -105,7 +105,7 @@ export default function Menu() {
         // 점심 메뉴 추가
         if (menu.lunch.main) {
           todayMenus.push({
-            type: '점심 메뉴',
+            type: '점심',
             date: menu.date,
             main: menu.lunch.main,
             sides: menu.lunch.sides,
@@ -116,7 +116,7 @@ export default function Menu() {
         // 저녁 메뉴 추가
         if (menu.dinner.main) {
           todayMenus.push({
-            type: '저녁 메뉴',
+            type: '저녁',
             date: menu.date,
             main: menu.dinner.main,
             sides: menu.dinner.sides,
@@ -145,12 +145,24 @@ export default function Menu() {
       setEditingIndex(null);
     } else {
       // 추가 모드
-      setTodayMenus([
-        ...todayMenusState,
-        { ...form },
-      ]);
+      if (form.type === '점심&저녁') {
+        // 점심&저녁 선택시 두 개의 메뉴 생성
+        const lunchMenu = { ...form, type: '점심' };
+        const dinnerMenu = { ...form, type: '저녁' };
+        setTodayMenus([
+          ...todayMenusState,
+          lunchMenu,
+          dinnerMenu,
+        ]);
+      } else {
+        // 점심 또는 저녁만 선택시 하나의 메뉴 생성
+        setTodayMenus([
+          ...todayMenusState,
+          { ...form },
+        ]);
+      }
     }
-    setForm({ type: '점심 메뉴', date: '', main: '', sides: '', soup: '', allergy: '' });
+    setForm({ type: '점심', date: '', main: '', sides: '', soup: '', allergy: '' });
     setModalOpen(false);
   };
   // 주간 메뉴 추가 핸들러
@@ -213,20 +225,20 @@ export default function Menu() {
       {
         '요일': '월',
         '날짜': '2024-01-15',
-        '점심주요리': '소불고기',
+        '점심메인요리': '소불고기',
         '점심종류': '한식',
         '점심반찬': '밥, 계란말이, 시금치나물',
-        '저녁주요리': '치킨까스',
+        '저녁메인요리': '치킨까스',
         '저녁종류': '양식',
         '저녁반찬': '밥, 샐러드, 감자튀김'
       },
       {
         '요일': '화',
         '날짜': '2024-01-16',
-        '점심주요리': '짜장덮밥',
+        '점심메인요리': '짜장덮밥',
         '점심종류': '중식',
         '점심반찬': '단무지, 양파',
-        '저녁주요리': '제육볶음',
+        '저녁메인요리': '제육볶음',
         '저녁종류': '한식',
         '저녁반찬': '밥, 콩나물'
       }
@@ -240,10 +252,10 @@ export default function Menu() {
     ws['!cols'] = [
       { width: 8 },  // 요일
       { width: 12 }, // 날짜
-      { width: 15 }, // 점심주요리
+      { width: 15 }, // 점심메인요리
       { width: 10 }, // 점심종류
       { width: 20 }, // 점심반찬
-      { width: 15 }, // 저녁주요리
+      { width: 15 }, // 저녁메인요리
       { width: 10 }, // 저녁종류
       { width: 20 }  // 저녁반찬
     ];
@@ -267,17 +279,17 @@ export default function Menu() {
 
         // 주간 메뉴 업로드
         const validWeekMenus = jsonData.filter(row => 
-          row['요일'] && row['날짜'] && row['점심주요리'] && row['저녁주요리']
+          row['요일'] && row['날짜'] && row['점심메인요리'] && row['저녁메인요리']
         ).map(row => ({
           day: row['요일'],
           date: row['날짜'],
           lunch: { 
-            main: row['점심주요리'], 
+            main: row['점심메인요리'], 
             type: row['점심종류'] || '한식', 
             sides: row['점심반찬'] || '' 
           },
           dinner: { 
-            main: row['저녁주요리'], 
+            main: row['저녁메인요리'], 
             type: row['저녁종류'] || '한식', 
             sides: row['저녁반찬'] || '' 
           }
@@ -327,7 +339,7 @@ export default function Menu() {
               setModalType('today'); 
               setIsEditing(false);
               setEditingIndex(null);
-              setForm({ type: '점심 메뉴', date: '', main: '', sides: '', soup: '', allergy: '' });
+              setForm({ type: '점심', date: '', main: '', sides: '', soup: '', allergy: '' });
               setModalOpen(true); 
             }}>
               <FontAwesomeIcon icon={faPlus} size="lg" /> 메뉴 추가
@@ -371,46 +383,51 @@ export default function Menu() {
                   <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
                     메뉴 타입 *
                   </label>
-                  <select 
-                    className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
-                    value={form.type} 
-                    onChange={e => {
-                      setForm({...form, type: e.target.value});
-                      if (e.target.value === '점심 메뉴') {
-                        setSameAsLunch(false);
-                      }
-                    }}
-                  >
-                    <option value="점심 메뉴">점심 메뉴</option>
-                    <option value="저녁 메뉴">저녁 메뉴</option>
-                  </select>
-                </div>
-                
-                {form.type === '저녁 메뉴' && (
-                  <div className="flex items-center gap-2 p-3 bg-[var(--bgTertiary)] rounded">
-                    <input 
-                      type="checkbox" 
-                      id="sameAsLunch" 
-                      checked={sameAsLunch} 
-                      onChange={(e) => {
-                        setSameAsLunch(e.target.checked);
-                        if (e.target.checked) {
-                          const lunchMenu = todayMenusState.find(menu => menu.type === '점심 메뉴');
-                          if (lunchMenu) {
-                            setForm({
-                              ...form,
-                              main: lunchMenu.main,
-                              sides: lunchMenu.sides,
-                              soup: lunchMenu.soup,
-                              allergy: lunchMenu.allergy,
-                            });
-                          }
-                        }
-                      }}
-                    />
-                    <label htmlFor="sameAsLunch" className="text-sm text-[var(--contentMain)]">점심 메뉴와 동일</label>
+                  <div className="flex gap-6">
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        id="type-both" 
+                        name="menuType" 
+                        value="점심&저녁"
+                        checked={form.type === '점심&저녁'} 
+                        onChange={e => {
+                          setForm({...form, type: e.target.value});
+                        }}
+                        className="w-4 h-4 text-[var(--primaryBlue)]"
+                      />
+                      <label htmlFor="type-both" className="text-sm text-[var(--contentMain)]">점심&저녁</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        id="type-lunch" 
+                        name="menuType" 
+                        value="점심"
+                        checked={form.type === '점심'} 
+                        onChange={e => {
+                          setForm({...form, type: e.target.value});
+                        }}
+                        className="w-4 h-4 text-[var(--primaryBlue)]"
+                      />
+                      <label htmlFor="type-lunch" className="text-sm text-[var(--contentMain)]">점심</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        id="type-dinner" 
+                        name="menuType" 
+                        value="저녁"
+                        checked={form.type === '저녁'} 
+                        onChange={e => {
+                          setForm({...form, type: e.target.value});
+                        }}
+                        className="w-4 h-4 text-[var(--primaryBlue)]"
+                      />
+                      <label htmlFor="type-dinner" className="text-sm text-[var(--contentMain)]">저녁</label>
+                    </div>
                   </div>
-                )}
+                </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
@@ -427,15 +444,14 @@ export default function Menu() {
                 
                 <div>
                   <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
-                    주요리 *
+                    메인요리 *
                   </label>
                   <input 
                     className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
-                    placeholder="주요리를 입력하세요" 
+                    placeholder="메인요리를 입력하세요" 
                     value={form.main} 
                     onChange={e => setForm({...form, main: e.target.value})} 
-                    required 
-                    disabled={sameAsLunch}
+                    required
                   />
                 </div>
                 
@@ -448,8 +464,7 @@ export default function Menu() {
                     placeholder="반찬을 입력하세요" 
                     value={form.sides} 
                     onChange={e => setForm({...form, sides: e.target.value})} 
-                    required 
-                    disabled={sameAsLunch}
+                    required
                   />
                 </div>
                 
@@ -461,8 +476,7 @@ export default function Menu() {
                     className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
                     placeholder="국물을 입력하세요" 
                     value={form.soup} 
-                    onChange={e => setForm({...form, soup: e.target.value})} 
-                    disabled={sameAsLunch}
+                    onChange={e => setForm({...form, soup: e.target.value})}
                   />
                 </div>
                 
@@ -474,8 +488,7 @@ export default function Menu() {
                     className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]" 
                     placeholder="알레르기 정보를 입력하세요" 
                     value={form.allergy} 
-                    onChange={e => setForm({...form, allergy: e.target.value})} 
-                    disabled={sameAsLunch}
+                    onChange={e => setForm({...form, allergy: e.target.value})}
                   />
                 </div>
                 
@@ -485,7 +498,6 @@ export default function Menu() {
                     className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" 
                     onClick={() => {
                       setModalOpen(false);
-                      setSameAsLunch(false);
                     }}
                   >
                     취소
@@ -591,7 +603,7 @@ export default function Menu() {
                         <div className="space-y-2">
                           <input 
                             className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
-                            placeholder="점심 주요리" 
+                            placeholder="점심 메인요리" 
                             value={row.lunch.main} 
                             onChange={e => { 
                               const copy = [...weekForm]; 
@@ -659,7 +671,7 @@ export default function Menu() {
                         <div className="space-y-2">
                           <input 
                             className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
-                            placeholder="저녁 주요리" 
+                            placeholder="저녁 메인요리" 
                             value={row.dinner.main} 
                             onChange={e => { 
                               const copy = [...weekForm]; 
@@ -800,7 +812,7 @@ export default function Menu() {
               <div className="text-xs text-[var(--contentCaption)] mb-2">{menu.date.split(' | ')[0]}</div>
               <div className="border-b border-[var(--borderOutline)] mb-4"></div>
               <div className="mb-2">
-                <div className="text-[var(--contentCaption)] text-sm font-medium">주요리</div>
+                <div className="text-[var(--contentCaption)] text-sm font-medium">메인요리</div>
                 <div className="text-xl font-bold text-[var(--contentMain)]">{menu.main}</div>
               </div>
               <div className="mb-2">

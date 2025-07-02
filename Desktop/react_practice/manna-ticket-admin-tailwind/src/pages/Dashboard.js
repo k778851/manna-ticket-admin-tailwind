@@ -175,14 +175,14 @@ export default function Dashboard() {
           {
             label: '예약자 수',
             data: [0, 0],
-            backgroundColor: chartColors.blue,
+            backgroundColor: '#FFEA8B',
             borderRadius: 8,
             barThickness: 40,
           },
           {
             label: 'QR',
             data: [0, 0],
-            backgroundColor: chartColors.red,
+            backgroundColor: '#3182F6',
             borderRadius: 8,
             barThickness: 40,
           }
@@ -198,20 +198,20 @@ export default function Dashboard() {
         {
           label: '예약자 수',
           data: [currentData.lunch, currentData.dinner],
-          backgroundColor: chartColors.blue,
+          backgroundColor: '#FFEA8B',
           borderRadius: 8,
           barThickness: 40,
         },
         {
           label: 'QR',
           data: [currentData.qrLunch, currentData.qrDinner],
-          backgroundColor: chartColors.red,
+          backgroundColor: '#3182F6',
           borderRadius: 8,
           barThickness: 40,
         }
       ],
     };
-  }, [statsPeriod, dashboardData, chartColors]);
+  }, [statsPeriod, dashboardData]);
 
   // 차트 옵션
   const barOptions = useMemo(() => ({
