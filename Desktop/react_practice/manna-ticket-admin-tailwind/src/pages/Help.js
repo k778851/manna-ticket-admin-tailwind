@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faFileLines,
@@ -613,34 +613,89 @@ const updates = [
 export default function Help() {
   const [tab, setTab] = useState(0);
   const [search, setSearch] = useState('');
+  const tabMenuRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // 탭 메뉴 스크롤 상태 체크
+  const checkScroll = () => {
+    const el = tabMenuRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    const el = tabMenuRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, []);
+
+  // 화살표 클릭 시 스크롤 이동
+  const scrollTabs = (dir) => {
+    const el = tabMenuRef.current;
+    if (!el) return;
+    const scrollAmount = 120; // 한 메뉴 크기만큼
+    el.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+  };
 
   const content = helpContents[tab] || helpContents[0];
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
-      {/* 상단 타이틀, 검색, PDF 다운로드 */}
-      <div className="flex items-center justify-between px-10 pt-10 pb-4">
-        <h1 className="text-3xl font-bold text-[var(--contentMain)]">도움말</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">도움말</h1>
         <div className="flex gap-2 min-w-[320px] items-center">
           <input type="text" className="px-4 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" placeholder="도움말 검색..." value={search} onChange={e => setSearch(e.target.value)} style={{width:180}} />
           <button className="flex items-center gap-1 px-4 py-2 rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold hover:bg-[var(--bgTertiary)] transition"><FontAwesomeIcon icon={faFilePdf} className="w-5 h-5" /> PDF 다운로드</button>
         </div>
       </div>
       {/* 탭 메뉴 */}
-      <div className="flex justify-center gap-2 mb-6 px-10">
-        {tabMenus.map((menu, idx) => (
-          <button
-            key={menu}
-            onClick={() => setTab(idx)}
-            className={`flex-1 h-11 rounded-[var(--radius-s)] text-base transition font-semibold border ${tab===idx ? 'bg-[var(--bgPrimary)] border-[var(--contentMain)] shadow-sm text-[var(--contentMain)]' : 'bg-transparent border-transparent text-[var(--contentSub)]'}`}
-            style={{minWidth:120}}
-          >
-            {menu}
-          </button>
-        ))}
+      <div className="relative flex items-center justify-center mb-6 px-2 sm:px-10">
+        {/* 왼쪽 화살표 */}
+        <button
+          className="absolute left-0 z-10 h-11 w-7 flex items-center justify-center bg-white/80 rounded-full shadow-sm border border-[var(--borderOutline)]"
+          style={{visibility: canScrollLeft ? 'visible' : 'hidden'}}
+          onClick={() => scrollTabs(-1)}
+          tabIndex={-1}
+        >
+          〈
+        </button>
+        {/* 탭 메뉴 */}
+        <div
+          className="flex gap-2 overflow-x-auto whitespace-nowrap"
+          ref={tabMenuRef}
+          style={{scrollBehavior: 'smooth'}}
+        >
+          {tabMenus.map((menu, idx) => (
+            <button
+              key={menu}
+              onClick={() => setTab(idx)}
+              className={`flex-1 h-11 rounded-[var(--radius-s)] text-base transition font-semibold border min-w-[120px] ${tab===idx ? 'bg-[var(--bgPrimary)] border-[var(--contentMain)] shadow-sm text-[var(--contentMain)]' : 'bg-transparent border-transparent text-[var(--contentSub)]'}`}
+              style={{minWidth:120}}
+            >
+              {menu}
+            </button>
+          ))}
+        </div>
+        {/* 오른쪽 화살표 */}
+        <button
+          className="absolute right-0 z-10 h-11 w-7 flex items-center justify-center bg-white/80 rounded-full shadow-sm border border-[var(--borderOutline)]"
+          style={{visibility: canScrollRight ? 'visible' : 'hidden'}}
+          onClick={() => scrollTabs(1)}
+          tabIndex={-1}
+        >
+          〉
+        </button>
       </div>
       {/* 본문 카드 */}
-      <div className="bg-white rounded-[var(--radius-l)] shadow-sm p-8 border border-[var(--borderOutline)] mx-10 mb-8">
+      <div className="bg-white rounded-[var(--radius-l)] shadow-sm p-4 sm:p-8 border border-[var(--borderOutline)] mx-2 sm:mx-10 mb-8">
         <div className="font-bold text-xl text-[var(--contentMain)] mb-6">{content.title}</div>
         {content.sections && content.sections.map((section, idx) => (
           <div key={idx} className="mb-7">
@@ -653,9 +708,9 @@ export default function Help() {
         ))}
       </div>
       {/* 퀵메뉴 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-10 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-2 sm:px-10 mb-8">
         {quickMenus.map((q, idx) => (
-          <div key={q.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 border border-[var(--borderOutline)] flex flex-col items-center text-center">
+          <div key={q.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-4 sm:p-6 border border-[var(--borderOutline)] flex flex-col items-center text-center">
             {q.icon}
             <div className="font-bold text-[var(--contentMain)] mt-2 mb-1">{q.label}</div>
             <div className="text-sm text-[var(--contentCaption)] mb-3">{q.desc}</div>
@@ -664,7 +719,7 @@ export default function Help() {
         ))}
       </div>
       {/* 최근 업데이트 카드 */}
-      <div className="bg-white rounded-[var(--radius-l)] shadow-sm p-8 border border-[var(--borderOutline)] mx-10 mb-10">
+      <div className="bg-white rounded-[var(--radius-l)] shadow-sm p-4 sm:p-8 border border-[var(--borderOutline)] mx-2 sm:mx-10 mb-10">
         <div className="font-bold text-lg text-[var(--contentMain)] mb-4">최근 업데이트</div>
         <ul className="space-y-4">
           {updates.map(u => (

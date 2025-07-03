@@ -110,26 +110,25 @@ export default function Reservations() {
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
-      {/* 상단 타이틀 + 버튼/필터 */}
-      <div className="flex items-center justify-between px-10 pt-10 pb-4">
-        <h1 className="text-3xl font-bold text-[var(--contentMain)]">예약 현황 관리</h1>
-        <div className="flex gap-2 min-w-[420px]">
-          <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--bgPrimary)] text-sm" style={{width:120}} defaultValue="오늘">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">예약 관리</h1>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-wrap">
+          <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--bgPrimary)] text-sm min-w-[100px] w-full sm:w-auto" defaultValue="오늘">
             <option value="오늘">오늘</option>
             <option value="이번주">이번주</option>
             <option value="이번달">이번달</option>
           </select>
           <button 
-            className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)] hover:bg-[var(--bgTertiary)] transition"
+            className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)] hover:bg-[var(--bgTertiary)] transition w-full sm:w-auto"
             onClick={exportToExcel}
           >
             <FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 예약 현황 내보내기
           </button>
-          <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => navigate('/qr')}><FontAwesomeIcon icon={faQrcode} className="w-5 h-5" /> QR 미제출자 확인</button>
+          <button className="button-primary-m flex items-center gap-1 px-4 py-2 w-full sm:w-auto" onClick={() => navigate('/qr')}><FontAwesomeIcon icon={faQrcode} className="w-5 h-5" /> QR 미제출자 확인</button>
         </div>
       </div>
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-5 px-10 pb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-5 px-4 sm:px-10 pb-6">
         {statCards.map((card, idx) => (
           <div key={card.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col items-center border border-[var(--borderOutline)] min-h-[80px]">
             <div className="text-[var(--contentCaption)] text-sm">{card.label}</div>
@@ -138,36 +137,36 @@ export default function Reservations() {
         ))}
       </div>
       {/* 탭 메뉴 */}
-      <div className="flex justify-center gap-2 mb-3 px-10">
+      <div className="flex flex-col sm:flex-row justify-center gap-2 mb-3 px-4 sm:px-10">
         {customTabs.map(tabItem => (
           <button
             key={tabItem.value}
             onClick={() => setTab(tabItem.value)}
             className={`flex-1 h-11 rounded-[var(--radius-s)] text-base transition font-semibold border ${tab===tabItem.value ? 'bg-[var(--bgPrimary)] border-[var(--contentMain)] shadow-sm text-[var(--contentMain)]' : 'bg-transparent border-transparent text-[var(--contentSub)]'}`}
-            style={{minWidth:160}}
+            style={{minWidth:120}}
           >
             {tabItem.label}
           </button>
         ))}
       </div>
       {/* 예약 현황 테이블 카드 */}
-      <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 border border-[var(--borderOutline)] mx-10 mb-10">
+      <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-4 sm:p-6 border border-[var(--borderOutline)] mx-2 sm:mx-10 mb-10">
         <div className="font-bold text-[var(--contentMain)] mb-1">{tab === 0 ? '일반 예약 현황' : '추가 예약 현황'}</div>
         <div className="text-sm text-[var(--contentCaption)] mb-3">{tab === 0 ? '정규 식사 예약을 확인하고 관리할 수 있습니다.' : '추가 식사 예약을 확인하고 관리할 수 있습니다.'}</div>
         {/* 검색/필터 */}
-        <div className="flex gap-2 items-center mb-4">
-          <div className="relative">
-            <input type="text" className="pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" style={{width:220}} placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="flex flex-col sm:flex-row gap-2 items-center mb-4">
+          <div className="relative w-full sm:w-auto">
+            <input type="text" className="pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm w-full sm:w-[220px]" placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
             <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
           </div>
-          <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--white)] text-sm" value={mealFilter} onChange={e => setMealFilter(e.target.value)} style={{width:100}}>
+          <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--white)] text-sm w-full sm:w-[100px]" value={mealFilter} onChange={e => setMealFilter(e.target.value)}>
             <option value="전체">전체</option>
             <option value="점심">점심</option>
             <option value="저녁">저녁</option>
           </select>
         </div>
-        {/* 테이블 */}
-        <div className="overflow-x-auto">
+        {/* 테이블: 데스크톱 */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
@@ -215,6 +214,29 @@ export default function Reservations() {
               ))}
             </tbody>
           </table>
+        </div>
+        {/* 카드형: 모바일 */}
+        <div className="block sm:hidden space-y-2">
+          {filtered.map(r => (
+            <div key={r.id} className="border rounded-lg p-3 bg-white shadow-sm">
+              <div className="flex justify-between mb-1"><span className="font-bold">{r.user}</span><span className="text-xs text-[var(--contentCaption)]">{r.department}</span></div>
+              <div className="text-xs text-[var(--contentCaption)] mb-1">{r.date}</div>
+              {tab === 1 && (
+                <>
+                  <div className="text-xs mb-1"><b>신청 사유:</b> {r.reason}</div>
+                  <div className="text-xs mb-1"><b>추가 인원:</b> {r.count}명</div>
+                </>
+              )}
+              <div className="flex flex-wrap gap-2 text-sm">
+                <div><b>점심</b>: {r.meal === '점심' ? <span className="text-green-600">O</span> : <span className="text-gray-400">X</span>}</div>
+                <div><b>저녁</b>: {r.meal === '저녁' ? <span className="text-green-600">O</span> : <span className="text-gray-400">X</span>}</div>
+                <div><b>QR(점심)</b>: {r.meal === '점심' ? (r.qr ? <span className="text-blue-600">제출</span> : <span className="text-red-500">미제출</span>) : '-'}</div>
+                <div><b>QR(저녁)</b>: {r.meal === '저녁' ? (r.qr ? <span className="text-blue-600">제출</span> : <span className="text-red-500">미제출</span>) : '-'}</div>
+                <div><b>제출시간(점심)</b>: {r.meal === '점심' ? (r.time && r.time !== '-' ? r.time : '-') : '-'}</div>
+                <div><b>제출시간(저녁)</b>: {r.meal === '저녁' ? (r.time && r.time !== '-' ? r.time : '-') : '-'}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

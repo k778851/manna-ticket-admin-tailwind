@@ -280,7 +280,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-page">
+    <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">대시보드</h1>
+        {/* 필요시 버튼 영역 추가 */}
+      </div>
       {/* Dashboard Title & Actions */}
       <div className="bg-[var(--bgSecondary)] px-2 sm:px-10 py-7 flex flex-col gap-5">
                   <div className="flex items-center justify-between w-full">

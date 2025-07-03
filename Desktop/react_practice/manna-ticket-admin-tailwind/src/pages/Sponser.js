@@ -141,9 +141,8 @@ export default function Sponser() {
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
-      {/* 상단 타이틀 + 버튼 */}
-      <div className="flex items-center justify-between px-10 pt-10 pb-2 mb-6">
-        <h1 className="text-3xl font-bold text-[var(--contentMain)]">후원 현황 관리</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">후원 관리</h1>
         <div className="flex gap-2">
           <button 
             className="button-primary-m flex items-center gap-1 px-4 py-2"
@@ -154,9 +153,9 @@ export default function Sponser() {
         </div>
       </div>
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-10 mb-8 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 sm:px-10 mb-8 w-full">
         {sponsorStats.map(stat => (
-          <div key={stat.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 flex flex-col items-end md:items-start border border-[var(--borderOutline)] min-h-[80px]">
+          <div key={stat.label} className="bg-white rounded-[var(--radius-m)] shadow-sm p-4 sm:p-6 flex flex-col items-end md:items-start border border-[var(--borderOutline)] min-h-[80px]">
             <div className="flex items-center gap-1 text-[var(--contentCaption)] text-sm font-semibold w-full justify-between">
               <span>{stat.label}</span>
               {stat.icon}
@@ -166,7 +165,7 @@ export default function Sponser() {
         ))}
       </div>
       {/* 게시글 목록 카드 */}
-      <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] mx-10 p-8 mb-6">
+      <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] mx-4 sm:mx-10 p-4 sm:p-8 mb-6">
         <div className="font-bold text-[var(--contentMain)] mb-1 text-lg">후원 감사 게시글</div>
         <div className="text-sm text-[var(--contentCaption)] mb-4">후원에 대한 감사 인사와 관련 소식을 관리할 수 있습니다.</div>
         <div className="flex gap-2 items-center mb-4">
@@ -186,7 +185,39 @@ export default function Sponser() {
             <option value="임시저장">임시저장</option>
           </select>
         </div>
-        <div className="overflow-x-auto">
+        {/* 모바일 카드형 게시글 목록 */}
+        <div className="block sm:hidden space-y-4">
+          {filtered
+            .sort((a, b) => {
+              if (a.isFixed && !b.isFixed) return -1;
+              if (!a.isFixed && b.isFixed) return 1;
+              return new Date(b.date) - new Date(a.date);
+            })
+            .map(p => (
+              <div key={p.id} className="bg-white rounded-[var(--radius-m)] shadow-sm border border-[var(--borderOutline)] p-4 flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <span className="font-bold text-[var(--contentMain)]">{p.title}</span>
+                  <div className="flex flex-wrap gap-1 mt-1 sm:mt-0 sm:ml-2">
+                    {p.isNew && <span className="inline-block bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
+                    {p.isFixed && <span className="inline-block bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
+                  </div>
+                </div>
+                <div className="flex gap-2 text-xs flex-wrap">
+                  <span className="text-[var(--contentCaption)]">{p.author}</span>
+                  <span className="px-2 py-1 rounded font-bold bg-[var(--green100)] text-[var(--green500)]">{p.status}</span>
+                  <span className="text-[var(--contentCaption)]">{p.views}회</span>
+                  <span className="text-[var(--contentCaption)]">{p.date}</span>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="상세" onClick={() => handleViewClick(p)}><FontAwesomeIcon icon={faEye} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="수정" onClick={() => handleEditClick(p)}><FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" /></button>
+                  <button className="p-2 hover:bg-[var(--bgTertiary)] rounded" title="삭제" onClick={() => handleDeletePost(p.id)}><FontAwesomeIcon icon={faTrash} className="w-4 h-4" /></button>
+                </div>
+              </div>
+            ))}
+        </div>
+        {/* 데스크탑 테이블형 게시글 목록 */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
@@ -208,11 +239,13 @@ export default function Sponser() {
                 .map(p => (
                   <tr key={p.id} className="border-b last:border-b-0">
                     <td className="py-3 px-2 text-left font-medium text-[var(--contentMain)]">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center">
                         {p.image && <FontAwesomeIcon icon={faUpload} className="w-3 h-3 text-[var(--primaryBlue)]" title="이미지 포함" />}
                         <span>{p.title}</span>
-                        {p.isNew && <span className="bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
-                        {p.isFixed && <span className="bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
+                        <div className="flex flex-wrap gap-1 mt-1 sm:mt-0 sm:ml-2">
+                          {p.isNew && <span className="inline-block bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
+                          {p.isFixed && <span className="inline-block bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
+                        </div>
                       </div>
                     </td>
                     <td className="py-3 px-2 text-center">{p.author}</td>
@@ -233,18 +266,20 @@ export default function Sponser() {
         </div>
       </div>
       {/* 최근 게시글 미리보기 카드 */}
-      <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] mx-10 p-8 mb-10">
+      <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] mx-4 sm:mx-10 p-4 sm:p-8 mb-10">
         <div className="font-bold text-[var(--contentMain)] mb-1 text-lg">최근 게시글 미리보기</div>
         <div className="text-sm text-[var(--contentCaption)] mb-4">최근 작성된 후원 감사 게시글을 확인할 수 있습니다.</div>
         <div className="flex flex-col gap-4">
           {previewPosts.map(post => (
-            <div key={post.id} className="bg-[var(--bgTertiary)] rounded-[var(--radius-s)] p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div key={post.id} className="bg-[var(--bgTertiary)] rounded-[var(--radius-s)] p-4 sm:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex flex-col sm:flex-row sm:items-center">
                   {post.image && <FontAwesomeIcon icon={faUpload} className="w-3 h-3 text-[var(--primaryBlue)]" title="이미지 포함" />}
                   <span className="font-semibold text-[var(--contentMain)]">{post.title}</span>
-                  {post.isNew && <span className="bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
-                  {post.isFixed && <span className="bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
+                  <div className="flex flex-wrap gap-1 mt-1 sm:mt-0 sm:ml-2">
+                    {post.isNew && <span className="inline-block bg-[var(--red100)] text-[var(--red500)] text-xs font-bold px-2 py-0.5 rounded">NEW</span>}
+                    {post.isFixed && <span className="inline-block bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs font-bold px-2 py-0.5 rounded">고정</span>}
+                  </div>
                 </div>
                 <div className="text-[var(--contentCaption)] text-sm mb-1 line-clamp-2">{post.content}</div>
                 <div className="flex gap-3 text-xs text-[var(--contentCaption)]">

@@ -327,9 +327,8 @@ export default function Menu() {
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
-      {/* 상단 타이틀 + 버튼 */}
-      <div className="flex items-center justify-between px-10 pt-10 pb-4">
-        <h1 className="text-3xl font-bold text-[var(--contentMain)]">식단 메뉴 관리</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">메뉴 관리</h1>
         <div className="flex gap-2">
           <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]" onClick={() => setUploadModalOpen(true)}>
             <FontAwesomeIcon icon={faUpload} size="lg" /> 주간메뉴 일괄 업로드
@@ -679,7 +678,6 @@ export default function Menu() {
                               setWeekForm(copy); 
                             }} 
                             required
-                            disabled={weekSameAsLunch[idx]}
                           />
                           <input 
                             className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
@@ -691,7 +689,6 @@ export default function Menu() {
                               setWeekForm(copy); 
                             }} 
                             required
-                            disabled={weekSameAsLunch[idx]}
                           />
                           <input 
                             className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)] text-sm" 
@@ -703,7 +700,6 @@ export default function Menu() {
                               setWeekForm(copy); 
                             }} 
                             required
-                            disabled={weekSameAsLunch[idx]}
                           />
                         </div>
                       </div>
@@ -784,7 +780,7 @@ export default function Menu() {
         </div>
       )}
       {/* 탭 메뉴 */}
-      <div className="flex justify-center gap-2 mb-6 px-10">
+      <div className="flex justify-center gap-2 mb-6 px-4 sm:px-10">
         <button
           onClick={() => setTab(0)}
           className={`flex-1 h-11 rounded-[var(--radius-s)] text-base transition font-semibold border ${tab===0 ? 'bg-[var(--bgPrimary)] border-[var(--contentMain)] shadow-sm text-[var(--contentMain)]' : 'bg-transparent border-transparent text-[var(--contentSub)]'}`}
@@ -802,7 +798,7 @@ export default function Menu() {
       </div>
       {/* 오늘 메뉴 카드 */}
       {tab === 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-10 pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 sm:px-10 pb-10">
           {currentTodayMenus.map((menu, idx) => (
             <div key={idx} className="bg-white rounded-[var(--radius-l)] shadow-sm p-8 border border-[var(--borderOutline)] flex flex-col min-h-[320px]">
               <div className="flex items-center gap-2 mb-2">
@@ -845,20 +841,23 @@ export default function Menu() {
       )}
       {/* 주간 메뉴 탭 */}
       {tab === 1 && (
-        <div className="px-10 pb-10">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-xl font-bold text-[var(--contentMain)]">주간 식단표 <span className="text-base font-normal ml-2 text-[var(--contentCaption)]">2024년 1월 3주차</span></div>
-            <div className="flex gap-2 items-center">
-              <select className="px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--bgPrimary)] text-sm" style={{width:120}} defaultValue="이번 주">
+        <div className="px-4 sm:px-10 pb-10">
+          {/* 주간 식단표 상단 개선 */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-0">
+            <div>
+              <div className="text-xl font-bold text-[var(--contentMain)]">주간 식단표</div>
+              <div className="text-base font-normal text-[var(--contentCaption)]">2024년 1월 3주차</div>
+            </div>
+            <div className="flex gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
+              <select className="flex-1 w-full px-3 py-2 rounded border border-[var(--borderInput)] bg-[var(--bgPrimary)] text-sm" defaultValue="이번 주">
                 <option value="이번 주">이번 주</option>
                 <option value="다음 주">다음 주</option>
                 <option value="지난 주">지난 주</option>
               </select>
-              <button className="px-4 py-2 rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold flex items-center gap-1 shadow-sm hover:bg-[var(--bgTertiary)] transition" onClick={() => {
+              <button className="flex-1 w-full px-4 py-2 rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold flex items-center justify-center gap-1 shadow-sm hover:bg-[var(--bgTertiary)] transition" onClick={() => {
                 setModalType('week');
                 setIsEditing(true);
                 setEditingIndex(null);
-                
                 // 기존 주간 메뉴 데이터로 폼 설정
                 const existingWeekForm = weekMenusState.map(menu => ({
                   day: menu.day,
@@ -867,7 +866,6 @@ export default function Menu() {
                   dinner: { ...menu.dinner }
                 }));
                 setWeekForm(existingWeekForm);
-                
                 setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
                 setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
                 setModalOpen(true);
@@ -876,7 +874,61 @@ export default function Menu() {
               </button>
             </div>
           </div>
-          <div className="bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] overflow-x-auto">
+          {/* 모바일 카드형 주간 메뉴 */}
+          <div className="block sm:hidden space-y-4">
+            {weekMenusState.map((row, idx) => (
+              <div key={row.day + row.date + idx} className="bg-white rounded-lg shadow p-4 border">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-[var(--contentMain)]">{row.day}</span>
+                  <span className="text-xs text-[var(--contentCaption)]">{row.date}</span>
+                </div>
+                <div className="mb-2">
+                  <div className="text-xs text-[var(--contentCaption)] font-medium">점심</div>
+                  <div className="font-bold">{row.lunch.main}</div>
+                  <div className="text-xs text-[var(--contentSub)]">{row.lunch.sides}</div>
+                </div>
+                <div className="mb-2">
+                  <div className="text-xs text-[var(--contentCaption)] font-medium">저녁</div>
+                  <div className="font-bold">{row.dinner.main}</div>
+                  <div className="text-xs text-[var(--contentSub)]">{row.dinner.sides}</div>
+                </div>
+                <div className="flex justify-end">
+                  <button 
+                    className="p-2 hover:bg-[var(--bgTertiary)] rounded" 
+                    title="수정"
+                    onClick={() => {
+                      setModalType('week');
+                      setIsEditing(true);
+                      setEditingWeekIndex(idx);
+                      // 개별 행을 5일치 주간 메뉴로 확장
+                      const currentDate = new Date(row.date);
+                      const weekDates = [];
+                      for (let i = 0; i < 5; i++) {
+                        const date = new Date(currentDate);
+                        date.setDate(currentDate.getDate() - currentDate.getDay() + i + 1); // 월요일부터 시작
+                        weekDates.push(date.toISOString().split('T')[0]);
+                      }
+                      const weekDays = ['월', '화', '수', '목', '금'];
+                      const expandedWeekForm = weekDays.map((day, dayIdx) => ({
+                        day: day,
+                        date: weekDates[dayIdx],
+                        lunch: dayIdx === idx ? { ...row.lunch } : { main: '', type: '', sides: '' },
+                        dinner: dayIdx === idx ? { ...row.dinner } : { main: '', type: '', sides: '' }
+                      }));
+                      setWeekForm(expandedWeekForm);
+                      setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+                      setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
+                      setModalOpen(true);
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* 데스크탑 테이블형 주간 메뉴 */}
+          <div className="hidden sm:block bg-white rounded-[var(--radius-l)] shadow-sm border border-[var(--borderOutline)] overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[var(--bgTertiary)]">
@@ -908,7 +960,6 @@ export default function Menu() {
                           setModalType('week');
                           setIsEditing(true);
                           setEditingWeekIndex(idx);
-                          
                           // 개별 행을 5일치 주간 메뉴로 확장
                           const currentDate = new Date(row.date);
                           const weekDates = [];
@@ -917,7 +968,6 @@ export default function Menu() {
                             date.setDate(currentDate.getDate() - currentDate.getDay() + i + 1); // 월요일부터 시작
                             weekDates.push(date.toISOString().split('T')[0]);
                           }
-                          
                           const weekDays = ['월', '화', '수', '목', '금'];
                           const expandedWeekForm = weekDays.map((day, dayIdx) => ({
                             day: day,
@@ -925,7 +975,6 @@ export default function Menu() {
                             lunch: dayIdx === idx ? { ...row.lunch } : { main: '', type: '', sides: '' },
                             dinner: dayIdx === idx ? { ...row.dinner } : { main: '', type: '', sides: '' }
                           }));
-                          
                           setWeekForm(expandedWeekForm);
                           setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
                           setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화

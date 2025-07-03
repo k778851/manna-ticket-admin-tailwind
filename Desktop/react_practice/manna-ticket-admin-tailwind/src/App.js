@@ -27,34 +27,49 @@ function MainLayout() {
   const location = useLocation();
   const isLogin = location.pathname === '/login';
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = React.useState(false);
   const isMobile = useIsMobile();
 
-  // 모바일에서는 로그인 또는 대시보드만 전체화면으로 노출
-  if (isMobile) {
+  // 로그인 페이지는 전체화면으로 표시
+  if (isLogin) {
     return (
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     );
   }
 
   return (
     <div className="min-h-screen bg-[var(--bgSecondary)] flex flex-col">
-      {/* 로그인 페이지가 아니면 사이드바 노출 */}
-      {!isLogin && (
-        <Sidebar 
-          isCollapsed={isSidebarCollapsed}
-          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+      {/* 모바일에서 사이드바 오버레이 */}
+      {isMobile && isMobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
+      
+      {/* 사이드바 */}
+      <Sidebar 
+        isCollapsed={isMobile ? false : isSidebarCollapsed}
+        onToggle={() => {
+          if (isMobile) {
+            setIsMobileSidebarOpen(!isMobileSidebarOpen);
+          } else {
+            setIsSidebarCollapsed(!isSidebarCollapsed);
+          }
+        }}
+        isMobile={isMobile}
+        isMobileOpen={isMobileSidebarOpen}
+      />
+      
       <main
-        className="transition-all duration-300 flex-1"
-        style={{ marginLeft: isLogin ? 0 : isSidebarCollapsed ? 80 : 240 }}
+        className={`transition-all duration-300 flex-1`}
+        style={{ 
+          marginLeft: isMobile ? 0 : isSidebarCollapsed ? 80 : 240 
+        }}
       >
         <Routes>
-          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
@@ -68,15 +83,16 @@ function MainLayout() {
           <Route path="/icons" element={<Icons />} />
         </Routes>
       </main>
+      
       {/* 푸터 */}
-      {!isLogin && (
-        <footer 
-          className="bg-white border-t border-[var(--borderOutline)] py-4 text-center text-sm text-[var(--contentCaption)]"
-          style={{ marginLeft: isSidebarCollapsed ? 80 : 240 }}
-        >
-          © 2025 만나식권. All rights reserved.
-        </footer>
-      )}
+      <footer 
+        className="bg-white border-t border-[var(--borderOutline)] py-4 text-center text-sm text-[var(--contentCaption)]"
+        style={{ 
+          marginLeft: isMobile ? 0 : isSidebarCollapsed ? 80 : 240 
+        }}
+      >
+        © 2025 만나식권. All rights reserved.
+      </footer>
     </div>
   );
 }

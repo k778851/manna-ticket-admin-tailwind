@@ -196,9 +196,9 @@ export default function Users() {
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
       {/* 상단 타이틀 + 버튼 */}
-      <div className="flex items-center justify-between px-10 pt-10 pb-4">
-        <h1 className="text-3xl font-bold text-[var(--contentMain)]">사용자 관리</h1>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">사용자 관리</h1>
+        <div className="flex flex-col sm:flex-row gap-2">
           <button 
             className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]"
             onClick={() => setUploadModalOpen(true)}
@@ -212,6 +212,15 @@ export default function Users() {
             <FontAwesomeIcon icon={faDownload} className="w-5 h-5" /> 사용자 목록 내보내기
           </button>
           <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => setModalOpen(true)}><FontAwesomeIcon icon={faPlus} className="w-5 h-5" /> 사용자 추가</button>
+        </div>
+      </div>
+      {/* 검색창 */}
+      <div className="px-4 sm:px-10 pb-2">
+        <div className="flex gap-2 items-center mb-4">
+          <div className="relative">
+            <input type="text" className="w-full pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" style={{width:220}} placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
+          </div>
         </div>
       </div>
       {/* 사용자 추가 모달 */}
@@ -254,17 +263,10 @@ export default function Users() {
         </div>
       )}
       {/* 사용자 목록 */}
-      <div className="bg-white rounded-[var(--radius-m)] shadow-sm p-6 border border-[var(--borderOutline)] mx-10 mb-10">
-        <div className="font-bold text-[var(--contentMain)] mb-1">사용자 목록</div>
-        <div className="text-sm text-[var(--contentCaption)] mb-3">등록된 모든 사용자를 관리할 수 있습니다.<br/>점심/저녁 예약수는 매월 1일 자동 초기화됩니다.</div>
-        <div className="flex gap-2 items-center mb-4">
-          <div className="relative">
-            <input type="text" className="w-full pl-9 pr-3 py-2 rounded border border-[var(--borderInput)] bg-white text-sm" style={{width:220}} placeholder="사용자 검색..." value={search} onChange={e => setSearch(e.target.value)} />
-            <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--contentCaption)]" />
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+      <div className="px-2 sm:px-10 pb-10">
+        {/* 테이블: 데스크톱 */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="min-w-[600px] w-full text-sm">
             <thead>
               <tr className="bg-[var(--bgTertiary)]">
                 <th className="font-bold text-[var(--contentMain)] py-2">부서</th>
@@ -300,6 +302,24 @@ export default function Users() {
               ))}
             </tbody>
           </table>
+        </div>
+        {/* 카드형: 모바일 */}
+        <div className="block sm:hidden space-y-2">
+          {filteredUsers.map(user => (
+            <div key={user.id} className="border rounded-lg p-3 bg-white shadow-sm">
+              <div className="flex justify-between mb-1"><span className="font-bold">{user.name}</span><span className="text-xs text-[var(--contentCaption)]">{user.department}</span></div>
+              <div className="text-xs text-[var(--contentCaption)] mb-1">{user.personalNumber}</div>
+              <div className="flex flex-wrap gap-2 text-sm mb-2">
+                <div><b>점심예약</b>: {user.lunchCount}회</div>
+                <div><b>저녁예약</b>: {user.dinnerCount}회</div>
+                <div><b>QR제출률</b>: <span className="font-bold text-blue-600">{user.qr}%</span></div>
+              </div>
+              <div className="flex gap-2">
+                <button className="p-2 rounded hover:bg-gray-100" onClick={() => handleEditClick(user)}><FontAwesomeIcon icon={faPenToSquare} /></button>
+                <button className="p-2 rounded hover:bg-gray-100" onClick={() => handleDeleteUser(user.id)}><FontAwesomeIcon icon={faTrash} /></button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
       
