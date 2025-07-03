@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/manna-ticket-admin-tailwind/static/css/main.df1ec4ec.css",
-    "main.js": "/manna-ticket-admin-tailwind/static/js/main.10b87642.js",
+    "main.css": "/manna-ticket-admin-tailwind/static/css/main.513240de.css",
+    "main.js": "/manna-ticket-admin-tailwind/static/js/main.ab5bfb6c.js",
     "static/js/453.a4d1fb2c.chunk.js": "/manna-ticket-admin-tailwind/static/js/453.a4d1fb2c.chunk.js",
     "static/media/PretendardVariable.woff2": "/manna-ticket-admin-tailwind/static/media/PretendardVariable.2bc582461caf4e05b51d.woff2",
     "index.html": "/manna-ticket-admin-tailwind/index.html",
-    "main.df1ec4ec.css.map": "/manna-ticket-admin-tailwind/static/css/main.df1ec4ec.css.map",
-    "main.10b87642.js.map": "/manna-ticket-admin-tailwind/static/js/main.10b87642.js.map",
+    "main.513240de.css.map": "/manna-ticket-admin-tailwind/static/css/main.513240de.css.map",
+    "main.ab5bfb6c.js.map": "/manna-ticket-admin-tailwind/static/js/main.ab5bfb6c.js.map",
     "453.a4d1fb2c.chunk.js.map": "/manna-ticket-admin-tailwind/static/js/453.a4d1fb2c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.df1ec4ec.css",
-    "static/js/main.10b87642.js"
+    "static/css/main.513240de.css",
+    "static/js/main.ab5bfb6c.js"
   ]
 }
