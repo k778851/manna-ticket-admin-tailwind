@@ -669,7 +669,7 @@ export default function Help() {
         </button>
         {/* 탭 메뉴 */}
         <div
-          className="flex gap-2 overflow-x-auto whitespace-nowrap"
+          className="flex gap-2 overflow-x-auto sm:overflow-x-visible whitespace-nowrap w-full"
           ref={tabMenuRef}
           style={{scrollBehavior: 'smooth'}}
         >
