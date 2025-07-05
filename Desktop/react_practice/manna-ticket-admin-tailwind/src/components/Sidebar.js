@@ -16,7 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 const menus = [
   { path: '/', icon: <DashboardOutlinedIcon />, label: '대시보드' },
-  { path: '/users', icon: <PeopleOutlineIcon />, label: '회원 관리' },
+  { path: '/users', icon: <PeopleOutlineIcon />, label: '사용자 관리' },
   { path: '/reservations', icon: <CalendarTodayOutlinedIcon />, label: '예약 관리' },
   { path: '/qr', icon: <QrCode2OutlinedIcon />, label: 'QR 관리' },
   { path: '/menu', icon: <MenuBookOutlinedIcon />, label: '메뉴 관리' },

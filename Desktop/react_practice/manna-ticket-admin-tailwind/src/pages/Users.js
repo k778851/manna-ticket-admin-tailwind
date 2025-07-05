@@ -34,6 +34,20 @@ export default function Users() {
   const [form, setForm] = useState({ name: '', personalNumber: '', department: '' });
   const [editForm, setEditForm] = useState({ id: null, name: '', personalNumber: '', department: '' });
 
+  // 고유번호 포맷팅 함수
+  const formatPersonalNumber = (value) => {
+    // 숫자와 하이픈만 허용
+    const cleaned = value.replace(/[^\d-]/g, '');
+    // 하이픈 제거
+    const numbers = cleaned.replace(/-/g, '');
+    // 8자리 이후 하이픈 추가
+    if (numbers.length <= 8) {
+      return numbers;
+    } else {
+      return numbers.slice(0, 8) + '-' + numbers.slice(8, 13);
+    }
+  };
+
   const filteredUsers = users.filter(
     (u) =>
       (!search || u.name.includes(search) || u.personalNumber.includes(search))
@@ -237,10 +251,11 @@ export default function Users() {
             />
             <input
               className="border border-[var(--borderInput)] rounded px-3 py-2 text-sm"
-              placeholder="고유번호"
+              placeholder="고유번호 (예: 00371210-00149)"
               type="text"
               value={form.personalNumber}
-              onChange={e => setForm({ ...form, personalNumber: e.target.value })}
+              onChange={e => setForm({ ...form, personalNumber: formatPersonalNumber(e.target.value) })}
+              maxLength={14}
               required
             />
             {/* 부서 셀렉트 박스 */}
@@ -397,7 +412,9 @@ export default function Users() {
                 <input
                   type="text"
                   value={editForm.personalNumber}
-                  onChange={(e) => setEditForm({ ...editForm, personalNumber: e.target.value })}
+                  onChange={(e) => setEditForm({ ...editForm, personalNumber: formatPersonalNumber(e.target.value) })}
+                  placeholder="고유번호 (예: 00371210-00149)"
+                  maxLength={14}
                   className="w-full p-2 border border-[var(--borderInput)] rounded"
                 />
               </div>

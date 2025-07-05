@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUtensils,
@@ -12,7 +12,9 @@ import {
   faBowlFood,
   faPenToSquare,
   faXmark,
-  faEye
+  faEye,
+  faClock,
+  faCog
 } from '@fortawesome/free-solid-svg-icons';
 import * as XLSX from 'xlsx';
 
@@ -91,6 +93,16 @@ export default function Menu() {
   ]);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [editingWeekIndex, setEditingWeekIndex] = useState(null);
+  
+  // 메뉴 자동 갱신 관련 상태
+  const [autoRefreshModalOpen, setAutoRefreshModalOpen] = useState(false);
+  const [autoRefreshSettings, setAutoRefreshSettings] = useState({
+    enabled: false,
+    time: '11:00',
+    days: ['월', '화', '수', '목', '금']
+  });
+  const [lastRefreshTime, setLastRefreshTime] = useState(null);
+  const intervalRef = useRef(null);
 
   // 오늘 날짜에 해당하는 메뉴를 주간 메뉴에서 가져오는 함수
   const getTodayMenusFromWeek = () => {
@@ -325,6 +337,106 @@ export default function Menu() {
     return weekDates;
   };
 
+  // 메뉴 자동 갱신 함수
+  const refreshMenus = () => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][now.getDay()];
+    
+    // 오늘 요일이 설정된 요일에 포함되어 있는지 확인
+    if (!autoRefreshSettings.days.includes(dayOfWeek)) {
+      return;
+    }
+    
+    // 주간 메뉴에서 오늘 날짜의 메뉴를 찾아서 오늘 메뉴로 업데이트
+    const todayWeekMenus = weekMenusState.filter(menu => menu.date === today);
+    
+    if (todayWeekMenus.length > 0) {
+      const newTodayMenus = [];
+      todayWeekMenus.forEach(menu => {
+        // 점심 메뉴 추가
+        if (menu.lunch.main) {
+          newTodayMenus.push({
+            type: '점심',
+            date: `${menu.date} | ${menu.lunch.type}`,
+            main: menu.lunch.main,
+            sides: menu.lunch.sides,
+            soup: '',
+            allergy: ''
+          });
+        }
+        // 저녁 메뉴 추가
+        if (menu.dinner.main) {
+          newTodayMenus.push({
+            type: '저녁',
+            date: `${menu.date} | ${menu.dinner.type}`,
+            main: menu.dinner.main,
+            sides: menu.dinner.sides,
+            soup: '',
+            allergy: ''
+          });
+        }
+      });
+      
+      if (newTodayMenus.length > 0) {
+        setTodayMenus(newTodayMenus);
+        setLastRefreshTime(now);
+        console.log('메뉴가 자동으로 갱신되었습니다:', newTodayMenus);
+      }
+    }
+  };
+
+  // 자동 갱신 스케줄러 설정
+  useEffect(() => {
+    if (autoRefreshSettings.enabled) {
+      // 1분마다 체크하여 설정된 시간에 맞으면 갱신
+      intervalRef.current = setInterval(() => {
+        const now = new Date();
+        const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        
+        if (currentTime === autoRefreshSettings.time) {
+          refreshMenus();
+        }
+      }, 60000); // 1분마다 체크
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [autoRefreshSettings, weekMenusState]);
+
+  // 컴포넌트 마운트 시 로컬 스토리지에서 설정 불러오기
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('menuAutoRefreshSettings');
+    if (savedSettings) {
+      setAutoRefreshSettings(JSON.parse(savedSettings));
+    }
+    
+    const savedLastRefresh = localStorage.getItem('menuLastRefreshTime');
+    if (savedLastRefresh) {
+      setLastRefreshTime(new Date(savedLastRefresh));
+    }
+  }, []);
+
+  // 설정 변경 시 로컬 스토리지에 저장
+  useEffect(() => {
+    localStorage.setItem('menuAutoRefreshSettings', JSON.stringify(autoRefreshSettings));
+  }, [autoRefreshSettings]);
+
+  // 마지막 갱신 시간 저장
+  useEffect(() => {
+    if (lastRefreshTime) {
+      localStorage.setItem('menuLastRefreshTime', lastRefreshTime.toISOString());
+    }
+  }, [lastRefreshTime]);
+
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[var(--bgSecondary)]">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
@@ -332,6 +444,13 @@ export default function Menu() {
         <div className="flex gap-2">
           <button className="button-tertiary-m flex items-center gap-1 px-4 py-2 border border-[var(--borderOutline)]" onClick={() => setUploadModalOpen(true)}>
             <FontAwesomeIcon icon={faUpload} size="lg" /> 주간메뉴 일괄 업로드
+          </button>
+          <button 
+            className={`button-tertiary-m flex items-center gap-1 px-4 py-2 border ${autoRefreshSettings.enabled ? 'border-green-500 bg-green-50' : 'border-[var(--borderOutline)]'}`} 
+            onClick={() => setAutoRefreshModalOpen(true)}
+          >
+            <FontAwesomeIcon icon={faClock} size="lg" /> 
+            {autoRefreshSettings.enabled ? '자동갱신 ON' : '자동갱신 설정'}
           </button>
           {tab === 0 && (
             <button className="button-primary-m flex items-center gap-1 px-4 py-2" onClick={() => { 
@@ -779,6 +898,121 @@ export default function Menu() {
           </div>
         </div>
       )}
+
+      {/* 자동 갱신 설정 모달 */}
+      {autoRefreshModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[var(--contentMain)]">메뉴 자동 갱신 설정</h3>
+              <button className="text-gray-400 hover:text-gray-700" onClick={() => setAutoRefreshModalOpen(false)}>
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {/* 자동 갱신 활성화 */}
+              <div className="flex items-center gap-3 p-3 bg-[var(--bgTertiary)] rounded">
+                <input 
+                  type="checkbox" 
+                  id="autoRefreshEnabled"
+                  checked={autoRefreshSettings.enabled} 
+                  onChange={(e) => setAutoRefreshSettings({
+                    ...autoRefreshSettings,
+                    enabled: e.target.checked
+                  })}
+                  className="w-4 h-4 text-[var(--primaryBlue)]"
+                />
+                <label htmlFor="autoRefreshEnabled" className="text-sm font-medium text-[var(--contentMain)]">
+                  자동 갱신 활성화
+                </label>
+              </div>
+              
+              {/* 갱신 시간 설정 */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  갱신 시간
+                </label>
+                <input 
+                  type="time" 
+                  value={autoRefreshSettings.time}
+                  onChange={(e) => setAutoRefreshSettings({
+                    ...autoRefreshSettings,
+                    time: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-[var(--borderInput)] rounded focus:outline-none focus:border-[var(--primaryBlue)]"
+                />
+              </div>
+              
+              {/* 갱신 요일 설정 */}
+              <div>
+                <label className="block text-sm font-medium text-[var(--contentMain)] mb-2">
+                  갱신 요일
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {['월', '화', '수', '목', '금'].map(day => (
+                    <div key={day} className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        id={`day-${day}`}
+                        checked={autoRefreshSettings.days.includes(day)} 
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAutoRefreshSettings({
+                              ...autoRefreshSettings,
+                              days: [...autoRefreshSettings.days, day]
+                            });
+                          } else {
+                            setAutoRefreshSettings({
+                              ...autoRefreshSettings,
+                              days: autoRefreshSettings.days.filter(d => d !== day)
+                            });
+                          }
+                        }}
+                        className="w-4 h-4 text-[var(--primaryBlue)]"
+                      />
+                      <label htmlFor={`day-${day}`} className="text-sm text-[var(--contentMain)]">{day}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* 마지막 갱신 시간 표시 */}
+              {lastRefreshTime && (
+                <div className="p-3 bg-[var(--bgTertiary)] rounded">
+                  <div className="text-sm font-medium text-[var(--contentMain)] mb-1">마지막 갱신 시간</div>
+                  <div className="text-sm text-[var(--contentCaption)]">
+                    {lastRefreshTime.toLocaleString('ko-KR')}
+                  </div>
+                </div>
+              )}
+              
+              {/* 수동 갱신 버튼 */}
+              <div>
+                <button 
+                  onClick={() => {
+                    refreshMenus();
+                    setAutoRefreshModalOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                >
+                  <FontAwesomeIcon icon={faCog} />
+                  지금 바로 갱신
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 mt-4">
+              <button 
+                className="flex-1 py-2 rounded bg-gray-200 text-gray-700 font-semibold" 
+                onClick={() => setAutoRefreshModalOpen(false)}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* 탭 메뉴 */}
       <div className="flex justify-center gap-2 mb-6 px-4 sm:px-10">
         <button
@@ -798,45 +1032,64 @@ export default function Menu() {
       </div>
       {/* 오늘 메뉴 카드 */}
       {tab === 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 sm:px-10 pb-10">
-          {currentTodayMenus.map((menu, idx) => (
-            <div key={idx} className="bg-white rounded-[var(--radius-l)] shadow-sm p-8 border border-[var(--borderOutline)] flex flex-col min-h-[320px]">
-              <div className="flex items-center gap-2 mb-2">
-                <FontAwesomeIcon icon={faUtensils} className="w-5 h-5 text-[var(--contentCaption)]" />
-                <span className="font-bold text-lg text-[var(--contentMain)]">{menu.type}</span>
+        <div className="px-4 sm:px-10 pb-10">
+          {/* 자동 갱신 상태 표시 */}
+          {autoRefreshSettings.enabled && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={faClock} className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium text-green-800">
+                  자동 갱신 활성화됨 - 매일 {autoRefreshSettings.time}에 갱신
+                </span>
               </div>
-              <div className="text-xs text-[var(--contentCaption)] mb-2">{menu.date.split(' | ')[0]}</div>
-              <div className="border-b border-[var(--borderOutline)] mb-4"></div>
-              <div className="mb-2">
-                <div className="text-[var(--contentCaption)] text-sm font-medium">메인요리</div>
-                <div className="text-xl font-bold text-[var(--contentMain)]">{menu.main}</div>
-              </div>
-              <div className="mb-2">
-                <div className="text-[var(--contentCaption)] text-sm font-medium">반찬</div>
-                <div className="text-[var(--contentMain)]">{menu.sides}</div>
-              </div>
-              <div className="mb-2">
-                <div className="text-[var(--contentCaption)] text-sm font-medium">국물</div>
-                <div className="text-[var(--contentMain)]">{menu.soup}</div>
-              </div>
-              <div className="flex justify-between text-sm mt-auto">
-                <span>알레르기: {menu.allergy}</span>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <button 
-                  className="px-4 py-2 rounded border border-[var(--borderOutline)] text-[var(--contentMain)] text-sm font-semibold hover:bg-[var(--bgTertiary)] transition"
-                  onClick={() => {
-                    setIsEditing(true);
-                    setEditingIndex(idx);
-                    setForm({ ...menu });
-                    setModalOpen(true);
-                  }}
-                >
-                  수정
-                </button>
-              </div>
+              {lastRefreshTime && (
+                <div className="text-xs text-green-600 mt-1">
+                  마지막 갱신: {lastRefreshTime.toLocaleString('ko-KR')}
+                </div>
+              )}
             </div>
-          ))}
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {currentTodayMenus.map((menu, idx) => (
+              <div key={idx} className="bg-white rounded-[var(--radius-l)] shadow-sm p-8 border border-[var(--borderOutline)] flex flex-col min-h-[320px]">
+                <div className="flex items-center gap-2 mb-2">
+                  <FontAwesomeIcon icon={faUtensils} className="w-5 h-5 text-[var(--contentCaption)]" />
+                  <span className="font-bold text-lg text-[var(--contentMain)]">{menu.type}</span>
+                </div>
+                <div className="text-xs text-[var(--contentCaption)] mb-2">{menu.date.split(' | ')[0]}</div>
+                <div className="border-b border-[var(--borderOutline)] mb-4"></div>
+                <div className="mb-2">
+                  <div className="text-[var(--contentCaption)] text-sm font-medium">메인요리</div>
+                  <div className="text-xl font-bold text-[var(--contentMain)]">{menu.main}</div>
+                </div>
+                <div className="mb-2">
+                  <div className="text-[var(--contentCaption)] text-sm font-medium">반찬</div>
+                  <div className="text-[var(--contentMain)]">{menu.sides}</div>
+                </div>
+                <div className="mb-2">
+                  <div className="text-[var(--contentCaption)] text-sm font-medium">국물</div>
+                  <div className="text-[var(--contentMain)]">{menu.soup}</div>
+                </div>
+                <div className="flex justify-between text-sm mt-auto">
+                  <span>알레르기: {menu.allergy}</span>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button 
+                    className="px-4 py-2 rounded border border-[var(--borderOutline)] text-[var(--contentMain)] text-sm font-semibold hover:bg-[var(--bgTertiary)] transition"
+                    onClick={() => {
+                      setIsEditing(true);
+                      setEditingIndex(idx);
+                      setForm({ ...menu });
+                      setModalOpen(true);
+                    }}
+                  >
+                    수정
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {/* 주간 메뉴 탭 */}
