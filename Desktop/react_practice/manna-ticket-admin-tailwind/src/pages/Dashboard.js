@@ -284,14 +284,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-10 pt-14 sm:pt-10 pb-2 sm:pb-4 gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold text-[var(--contentMain)] mb-2">대시보드</h1>
         {/* 필요시 버튼 영역 추가 */}
-      </div>
-      {/* Dashboard Title & Actions */}
-      <div className="bg-[var(--bgSecondary)] px-2 sm:px-10 py-7 flex flex-col gap-5">
-                  <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[var(--contentMain)] tracking-tight">대시보드</h1>
-            {/* <span className="bg-[var(--bgTertiary)] text-[var(--contentCaption)] text-xs rounded px-2 py-1 ml-2">ver 1.2.0</span> */}
-          </div>
+        <div className="flex items-center gap-3">
           <select
             value={statsPeriod}
             onChange={e => setStatsPeriod(e.target.value)}
@@ -303,8 +296,10 @@ export default function Dashboard() {
             <option value="month">월간</option>
           </select>
         </div>
-        
-                  {/* 자동 갱신 설정 카드 */}
+      </div>
+      {/* Dashboard Title & Actions */}
+      <div className="bg-[var(--bgSecondary)] px-2 sm:px-10 py-7 flex flex-col gap-5">
+          {/* 자동 갱신 설정 카드 */}
           <div className="w-full bg-white rounded-[var(--radius-m)] shadow-sm p-4 sm:p-6 border border-[var(--borderOutline)]">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex flex-wrap items-center gap-3">

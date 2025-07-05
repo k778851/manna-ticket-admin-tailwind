@@ -1107,22 +1107,25 @@ export default function Menu() {
                 <option value="다음 주">다음 주</option>
                 <option value="지난 주">지난 주</option>
               </select>
-              <button className="flex-1 w-full px-4 py-2 rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold flex items-center justify-center gap-1 shadow-sm hover:bg-[var(--bgTertiary)] transition" onClick={() => {
-                setModalType('week');
-                setIsEditing(true);
-                setEditingIndex(null);
-                // 기존 주간 메뉴 데이터로 폼 설정
-                const existingWeekForm = weekMenusState.map(menu => ({
-                  day: menu.day,
-                  date: menu.date,
-                  lunch: { ...menu.lunch },
-                  dinner: { ...menu.dinner }
-                }));
-                setWeekForm(existingWeekForm);
-                setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
-                setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
-                setModalOpen(true);
-              }}>
+              <button
+                className="px-4 py-2 min-w-[120px] rounded border border-[var(--borderOutline)] bg-white text-[var(--contentMain)] text-sm font-semibold flex items-center justify-center gap-1 shadow-sm hover:bg-[var(--bgTertiary)] transition whitespace-nowrap"
+                onClick={() => {
+                  setModalType('week');
+                  setIsEditing(true);
+                  setEditingIndex(null);
+                  // 기존 주간 메뉴 데이터로 폼 설정
+                  const existingWeekForm = weekMenusState.map(menu => ({
+                    day: menu.day,
+                    date: menu.date,
+                    lunch: { ...menu.lunch },
+                    dinner: { ...menu.dinner }
+                  }));
+                  setWeekForm(existingWeekForm);
+                  setWeekSameAsLunch([false, false, false, false, false]); // 체크박스 상태 초기화
+                  setAllWeekSameAsLunch(false); // 전체 체크박스 상태 초기화
+                  setModalOpen(true);
+                }}
+              >
                 <FontAwesomeIcon icon={faPenToSquare} size="lg" /> <span>주간 메뉴 편집</span>
               </button>
             </div>

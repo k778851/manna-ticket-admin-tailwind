@@ -295,7 +295,7 @@ export default function Users() {
             </thead>
             <tbody className="text-center">
               {filteredUsers.map(row => (
-                <tr key={row.id} className="border-b last:border-b-0">
+                <tr key={row.id} className="border-b last:border-b-0 bg-white">
                   <td className="py-2 text-center">{row.department}</td>
                   <td className="py-2 text-center">{row.name}</td>
                   <td className="py-2 text-center">{row.personalNumber}</td>
